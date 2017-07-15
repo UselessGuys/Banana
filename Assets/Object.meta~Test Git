@@ -1,13 +1,7 @@
 fileFormatVersion: 2
-<<<<<<< HEAD:Assets/Object.meta
 guid: f6490004a24c1be4586e57b8323a6edb
 folderAsset: yes
 timeCreated: 1500135402
-=======
-guid: 8325be7738414eb44aa7f2caa805bb1b
-folderAsset: yes
-timeCreated: 1500135383
->>>>>>> origin/master:Assets/Object.meta
 licenseType: Free
 DefaultImporter:
   userData: 
