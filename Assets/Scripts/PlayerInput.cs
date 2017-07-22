@@ -19,16 +19,8 @@ public class PlayerInput : MonoBehaviour
     {
         Vector2 directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         player.SetDirectionalInput(directionalInput);
-
-        if(Input.GetAxisRaw("Horizontal") != 0 && controller.collisions.below)
-        {
-            anim.SetBool("PlayerMove", true);
-        }
-        else
-        {
-            anim.SetBool("PlayerMove", false);
-        }
-        anim.SetBool("Grounded", controller.collisions.below);
+        anim.SetFloat("Speed", Mathf.Abs(player.velocity.x));
+            anim.SetBool("Grounded", controller.collisions.below);
 
         if (Input.GetButtonDown("Jump"))
         {

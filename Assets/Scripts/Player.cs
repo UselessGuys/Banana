@@ -24,7 +24,7 @@ public class Player : MonoBehaviour
     private float gravity;
     private float maxJumpVelocity;
     private float minJumpVelocity;
-    private Vector3 velocity;
+    public Vector3 velocity;
     private float velocityXSmoothing;
 
     private Controller2D controller;
@@ -44,7 +44,6 @@ public class Player : MonoBehaviour
     private void Update()
     {
         CalculateVelocity();
-        HandleWallSliding();
 
         controller.Move(velocity * Time.deltaTime, directionalInput);
 
@@ -100,43 +99,11 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void HandleWallSliding()
-    {
-        wallDirX = (controller.collisions.left) ? -1 : 1;
-        wallSliding = false;
-        if ((controller.collisions.left || controller.collisions.right) && !controller.collisions.below && velocity.y < 0)
-        {
-            wallSliding = true;
-
-            if (velocity.y < -wallSlideSpeedMax)
-            {
-                velocity.y = -wallSlideSpeedMax;
-            }
-
-            if (timeToWallUnstick > 0f)
-            {
-                velocityXSmoothing = 0f;
-                velocity.x = 0f;
-                if (directionalInput.x != wallDirX && directionalInput.x != 0f)
-                {
-                    timeToWallUnstick -= Time.deltaTime;
-                }
-                else
-                {
-                    timeToWallUnstick = wallStickTime;
-                }
-            }
-            else
-            {
-                timeToWallUnstick = wallStickTime;
-            }
-        }
-    }
 
     private void CalculateVelocity()
     {
         float targetVelocityX = directionalInput.x * moveSpeed;
-        velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below ? accelerationTimeGrounded : accelerationTimeAirborne));
+        velocity.x = targetVelocityX;
         velocity.y += gravity * Time.deltaTime;
     }
 }
