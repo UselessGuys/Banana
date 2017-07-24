@@ -9,6 +9,7 @@ public class SimpleEnemy : MonoBehaviour {
     Animator anim;
     private Controller2D controller;
     private SpriteRenderer rend;
+<<<<<<< HEAD
     public float Range = 10f;
     public float Speed = 2f;
     private float ZeroPos;
@@ -16,6 +17,15 @@ public class SimpleEnemy : MonoBehaviour {
     private float LeftPos;
     private bool RF = true;
 
+=======
+    public float walk;
+    public float range = 20f;
+    public float t = 2f;
+    public float ZeroPos;
+    public float LeftPos;
+    public bool RF = true;
+    public float RightPos;
+>>>>>>> 17f6e1095535d21d7f067f8ee4f89229707286b9
 
     private void Start()
     {
@@ -48,7 +58,12 @@ public class SimpleEnemy : MonoBehaviour {
         anim.SetFloat("Speed", Mathf.Abs(player.velocity.x));
         anim.SetBool("Grounded", controller.collisions.below); 
 
+<<<<<<< HEAD
         rend.flipX = !RF;
+=======
+
+            rend.flipX = (t < 0);
+>>>>>>> 17f6e1095535d21d7f067f8ee4f89229707286b9
 
     }
 
