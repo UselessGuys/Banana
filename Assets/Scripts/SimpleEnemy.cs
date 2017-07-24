@@ -16,6 +16,7 @@ public class SimpleEnemy : MonoBehaviour {
     public float LeftPos;
     public bool RF = true;
     public float RightPos;
+
     private void Start()
     {
         ZeroPos = this.transform.position.x;
@@ -48,9 +49,8 @@ public class SimpleEnemy : MonoBehaviour {
         anim.SetFloat("Speed", Mathf.Abs(player.velocity.x));
         anim.SetBool("Grounded", controller.collisions.below);
 
-       
 
-        rend.flipX = (t < 0);
+            rend.flipX = (t < 0);
 
     }
 }
