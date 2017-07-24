@@ -1,16 +1,10 @@
 fileFormatVersion: 2
-guid: 66e9fab423e196145898e61c9842ee01
-timeCreated: 1500741913
+guid: ae388b7a9dbbadc4a9b54d4b5ade9952
+timeCreated: 1500887684
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: SpriteSheet_0
-    21300002: SpriteSheet_1
-    21300004: SpriteSheet_2
-    21300006: SpriteSheet_3
-    21300008: SpriteSheet_4
-    21300010: SpriteSheet_5
-    21300012: SpriteSheet_6
+    21300000: MainSpriteSheet_0
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -48,7 +42,7 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
@@ -90,95 +84,11 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: SpriteSheet_0
+      name: MainSpriteSheet_0
       rect:
         serializedVersion: 2
         x: 0
         y: 605
-        width: 100
-        height: 150
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: SpriteSheet_1
-      rect:
-        serializedVersion: 2
-        x: 101
-        y: 605
-        width: 100
-        height: 150
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: SpriteSheet_2
-      rect:
-        serializedVersion: 2
-        x: 202
-        y: 605
-        width: 100
-        height: 150
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: SpriteSheet_3
-      rect:
-        serializedVersion: 2
-        x: 303
-        y: 605
-        width: 100
-        height: 150
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: SpriteSheet_4
-      rect:
-        serializedVersion: 2
-        x: 404
-        y: 605
-        width: 100
-        height: 150
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: SpriteSheet_5
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 454
-        width: 100
-        height: 150
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: SpriteSheet_6
-      rect:
-        serializedVersion: 2
-        x: 101
-        y: 454
         width: 100
         height: 150
       alignment: 0

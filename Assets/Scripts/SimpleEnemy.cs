@@ -9,18 +9,19 @@ public class SimpleEnemy : MonoBehaviour {
     Animator anim;
     private Controller2D controller;
     private SpriteRenderer rend;
-    public float walk;
-    public float range = 20f;
-    public float t = 2f;
-    public float ZeroPos;
-    public float LeftPos;
-    public bool RF = true;
-    public float RightPos;
+    public float Range = 10f;
+    public float Speed = 2f;
+    private float ZeroPos;
+    private float RightPos;
+    private float LeftPos;
+    private bool RF = true;
+
+
     private void Start()
     {
         ZeroPos = this.transform.position.x;
-        LeftPos = ZeroPos - range;
-        RightPos = ZeroPos + range;
+        LeftPos = ZeroPos - Range;
+        RightPos = ZeroPos + Range;
         player = this.GetComponent<Player>();
         rend = this.GetComponent<SpriteRenderer>();
         controller = this.GetComponent<Controller2D>();
@@ -30,27 +31,25 @@ public class SimpleEnemy : MonoBehaviour {
     private void Update()
     {
         
-        Vector2 directionalInput = new Vector2(t, 0);
+        Vector2 directionalInput = new Vector2(Speed, 0);
         player.SetDirectionalInput(directionalInput);
-        Debug.Log(Mathf.Abs(this.transform.position.x - ZeroPos));
         if(this.transform.position.x >= RightPos && RF)
         {
-            t = -t;
+            Speed = -Speed;
             RF = false;
         }
 
         if (this.transform.position.x <= LeftPos && !RF)
         {
-            t = -t;
+            Speed = -Speed;
 
             RF = true;
         }
         anim.SetFloat("Speed", Mathf.Abs(player.velocity.x));
-        anim.SetBool("Grounded", controller.collisions.below);
+        anim.SetBool("Grounded", controller.collisions.below); 
 
-       
-
-        rend.flipX = (t < 0);
+        rend.flipX = !RF;
 
     }
+
 }

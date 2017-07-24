@@ -4,24 +4,25 @@
 public class Player : MonoBehaviour
 {
     public float maxJumpHeight = 4f;
+    public float ClimbSpeed = 3f;
     public float minJumpHeight = 1f;
     public float timeToJumpApex = .4f;
     private float accelerationTimeAirborne = .2f;
     private float accelerationTimeGrounded = .1f;
     private float moveSpeed = 6f;
 
-    public Vector2 wallJumpClimb;
-    public Vector2 wallJumpOff;
-    public Vector2 wallLeap;
+    private Vector2 wallJumpClimb;
+    private Vector2 wallJumpOff;
+    private Vector2 wallLeap;
 
     public bool canDoubleJump;
     private bool isDoubleJumping = false;
 
-    public float wallSlideSpeedMax = 3f;
-    public float wallStickTime = .25f;
+    private float wallSlideSpeedMax = 100f;
+    private float wallStickTime = 0f;
     private float timeToWallUnstick;
 
-    private float gravity;
+    public float gravity;
     private float maxJumpVelocity;
     private float minJumpVelocity;
     public Vector3 velocity;
