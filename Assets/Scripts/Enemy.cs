@@ -50,10 +50,7 @@ namespace Assets.Scripts
 
         void Update()
         {
-<<<<<<< HEAD
-            
-            
-=======
+
             if (transform.position.x > RightBorder)
                 _rightDirection = false;
             if (transform.position.x < LeftBorder)
@@ -61,7 +58,6 @@ namespace Assets.Scripts
 
             CheckNoise();
 
->>>>>>> 150fd966fd4761304fe50942e27ae75633602a74
         }
 
         void FixedUpdate()
