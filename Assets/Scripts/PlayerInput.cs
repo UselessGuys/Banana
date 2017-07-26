@@ -3,6 +3,13 @@
 [RequireComponent(typeof(Player))]
 public class PlayerInput : MonoBehaviour
 {
+    enum ClimbingSide
+    {
+        None,
+        Left,
+        Right
+    };
+
     private Player player;
     Animator anim;
     private Controller2D controller;
@@ -10,8 +17,10 @@ public class PlayerInput : MonoBehaviour
     private bool flip;
     public bool grounded;
     private bool Climbing = false;
+    private ClimbingSide CS;
     private void Start()
     {
+        CS = ClimbingSide.None;
         player = GetComponent<Player>();
         rend = GetComponent<SpriteRenderer>();
         controller = GetComponent<Controller2D>();
@@ -38,8 +47,10 @@ public class PlayerInput : MonoBehaviour
         {
             player.OnJumpInputDown();
         }
-
-        rend.flipX = flip;
+        if (!Climbing) {
+            rend.flipX = flip;
+        }
+        
 
         if (Input.GetButtonUp("Jump"))
         {
@@ -51,12 +62,15 @@ public class PlayerInput : MonoBehaviour
             player.gravity = 0;
             player.velocity = Vector2.zero;
             player.velocity.y = Input.GetAxisRaw("Vertical") * player.ClimbSpeed;
+            player.velocity.x = 0;
+            player.SetDirectionalInput(new Vector2(0, Input.GetAxisRaw("Vertical")));
             anim.speed = Mathf.Abs(Input.GetAxisRaw("Vertical")/ player.ClimbSpeed*1.2f);           
         }
         else
         {
             player.gravity = -(2 * player.maxJumpHeight) / Mathf.Pow(player.timeToJumpApex, 2);
             anim.speed = 1;
+            player.SetDirectionalInput(directionalInput);
         }
     }
 
@@ -67,6 +81,14 @@ public class PlayerInput : MonoBehaviour
         {
             anim.SetBool("Climbing", true);
             Climbing = true;
+            if(collision.transform.position.x < this.transform.position.x)
+            {
+                CS = ClimbingSide.Left;
+            }
+            else if (collision.transform.position.x > this.transform.position.x)
+            {
+                CS = ClimbingSide.Right;
+            }
         }
     }
 

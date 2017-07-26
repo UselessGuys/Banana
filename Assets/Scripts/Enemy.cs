@@ -29,7 +29,7 @@ namespace Assets.Scripts
         void Update()
         {
             
-            if (_visionArea.)
+            
         }
 
         void FixedUpdate()
