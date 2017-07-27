@@ -94,8 +94,7 @@ namespace Assets.Scripts
                 _rightDirection = true;
             }
 
-            Animator.SetFloat("_currentSpeed", Mathf.Abs(_controller.Velocity.x));
-            Animator.SetBool("Grounded", _controller.Collisions.Below);
+            
 
             _renderer.flipX = !_rightDirection;
         }

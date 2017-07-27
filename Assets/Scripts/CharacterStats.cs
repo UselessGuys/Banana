@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
-    class CharacterStats
+    class CharacterStats : MonoBehaviour
     {
         public int Health;
         public int Mana;

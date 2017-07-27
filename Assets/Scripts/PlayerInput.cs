@@ -16,6 +16,7 @@ public class PlayerInput : MonoBehaviour
     private bool flip;
     public bool grounded;
     private bool Climbing = false;
+    private bool ClimbingV2 = false;
     private ClimbingSide CS;
     private bool CanClimbing = false;
 
@@ -40,6 +41,7 @@ public class PlayerInput : MonoBehaviour
         anim.SetFloat("Speed", Mathf.Abs(controller.Velocity.x));
         anim.SetBool("Grounded", controller.Collisions.Below);
         anim.SetBool("Climbing", Climbing);
+        anim.SetBool("ClimbingV2", ClimbingV2);
         if (Input.GetAxisRaw("Horizontal") < 0)
             flip = true;
         else if (Input.GetAxisRaw("Horizontal") > 0)
@@ -53,16 +55,22 @@ public class PlayerInput : MonoBehaviour
         if (Input.GetButtonUp("Jump"))
             controller.OnJumpInputUp();
 
-        if (Climbing && !CanClimbing)
+        if ((Climbing || ClimbingV2) && !CanClimbing )
         {
-            if (Input.GetButtonDown("Jump") || (Input.GetAxisRaw("Horizontal") > 0 && CS == ClimbingSide.Left) || (Input.GetAxisRaw("Horizontal") < 0 && CS == ClimbingSide.Right))
+            if ((Climbing)&&(Input.GetButtonDown("Jump") || (Input.GetAxisRaw("Horizontal") > 0 && CS == ClimbingSide.Left) || (Input.GetAxisRaw("Horizontal") < 0 && CS == ClimbingSide.Right)))
             {
                 Climbing = false;
                 CanClimbing = true;
             }
 
-            
-                controller.Gravity = 0;
+            if ((ClimbingV2) && (Input.GetButtonDown("Jump") || Mathf.Abs(Input.GetAxisRaw("Horizontal")) > 0.1f ))
+            {
+                ClimbingV2 = false;
+                CanClimbing = true;
+            }
+
+
+            controller.Gravity = 0;
             controller.Velocity.x = 0;
             controller.Velocity.y = Input.GetAxisRaw("Vertical") * controller.ClimbSpeed;
             controller.SetDirectionalInput(new Vector2(0, Input.GetAxisRaw("Vertical")));
@@ -89,6 +97,14 @@ public class PlayerInput : MonoBehaviour
             else if (collision.transform.position.x > transform.position.x)
                 CS = ClimbingSide.Right;
         }
+
+        if (collision.gameObject.tag == "LadderV2")
+        {
+
+            ClimbingV2 = true;
+            CanClimbing = false;
+
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -97,6 +113,11 @@ public class PlayerInput : MonoBehaviour
         if (collision.gameObject.tag == "Ladder")
         {
             Climbing = false;
+            CanClimbing = true;
+        }
+        if (collision.gameObject.tag == "LadderV2")
+        {
+            ClimbingV2 = false;
             CanClimbing = true;
         }
     }
