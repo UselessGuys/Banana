@@ -12,7 +12,7 @@ namespace Assets.Scripts
         public int Mana;
         public int Rage;
 
-        public int MoveSpeed;
+        public float MoveSpeed;
         public int JumpHeight;
 
         public int AttackSpeed;

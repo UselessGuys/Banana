@@ -18,23 +18,21 @@ namespace Assets.Scripts
     {
         public int LeftBorder;
         public int RightBorder;
-        public bool RightDirection;
-        public EnemyStates State;
-        public Animator Animator;
 
-        private EdgeCollider2D _visionArea;
+        public EnemyStates State;
+        //public Animator Animator;
+
         private CharacterStats _stats;
         private Controller2D _controller;   
         private SpriteRenderer _renderer;
 
         private bool _rightDirection;
-        private int _currentSpeed;
+        private float _currentSpeed;
 
         
 
         void Awake()
         {
-            _visionArea = GetComponent<EdgeCollider2D>();
             _stats = GetComponent<CharacterStats>();
             _controller = this.GetComponent<Controller2D>();
         }
@@ -78,23 +76,24 @@ namespace Assets.Scripts
 
         private void Move()
         {
-
-            Vector2 directionalInput = new Vector2(_currentSpeed, 0);
-            _controller.SetDirectionalInput(directionalInput);
-
+            Vector2 directionalInput;
             if (_rightDirection)
             {
-                _currentSpeed = -_currentSpeed;
-                _rightDirection = false;
+                directionalInput = new Vector2(_currentSpeed, 0);
+                Debug.Log("RD  " + transform.position.x);
             }
-
-            if (!_rightDirection)
+            else
             {
-                _currentSpeed = -_currentSpeed;
-                _rightDirection = true;
+                directionalInput = new Vector2(-_currentSpeed, 0);
+                Debug.Log("LD  " + transform.position.x);
             }
+            _controller.SetDirectionalInput(directionalInput);
 
-            
+
+
+            //Animator.SetFloat("_currentSpeed", Mathf.Abs(_controller.Velocity.x));
+            //Animator.SetBool("Grounded", _controller.Collisions.Below);
+
 
             _renderer.flipX = !_rightDirection;
         }
