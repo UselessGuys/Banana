@@ -3,20 +3,21 @@
 [RequireComponent(typeof(Controller2D))]
 public class PlayerInput : MonoBehaviour
 {
-    enum ClimbingSide
+    public enum ClimbingSide
     {
         None,
         Left,
         Right
     };
-    
-    Animator anim;
+
+    private Animator anim;
     private Controller2D controller;
     private SpriteRenderer rend;
     private bool flip;
     public bool grounded;
     private bool Climbing = false;
-    private ClimbingSide CS;
+    public ClimbingSide CS;
+
     private void Start()
     {
         CS = ClimbingSide.None;
@@ -29,32 +30,22 @@ public class PlayerInput : MonoBehaviour
 
     {
         grounded = controller.Collisions.Below;
-        Vector2 directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        var directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         controller.SetDirectionalInput(directionalInput);
         anim.SetFloat("Speed", Mathf.Abs(controller.Velocity.x));
         anim.SetBool("Grounded", controller.Collisions.Below);
         if (Input.GetAxisRaw("Horizontal") < 0)
-        {
             flip = true;
-        }
         else if (Input.GetAxisRaw("Horizontal") > 0)
-        {
             flip = false;
-        }
         if (Input.GetButtonDown("Jump"))
-        {
             controller.OnJumpInputDown();
-        }
         if (!Climbing)
-        {
             rend.flipX = flip;
-        }
 
 
         if (Input.GetButtonUp("Jump"))
-        {
             controller.OnJumpInputUp();
-        }
 
         if (Climbing)
         {
@@ -80,14 +71,10 @@ public class PlayerInput : MonoBehaviour
         {
             anim.SetBool("Climbing", true);
             Climbing = true;
-            if (collision.transform.position.x < this.transform.position.x)
-            {
+            if (collision.transform.position.x < transform.position.x)
                 CS = ClimbingSide.Left;
-            }
-            else if (collision.transform.position.x > this.transform.position.x)
-            {
+            else if (collision.transform.position.x > transform.position.x)
                 CS = ClimbingSide.Right;
-            }
         }
     }
 
