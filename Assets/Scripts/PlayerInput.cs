@@ -3,7 +3,7 @@
 [RequireComponent(typeof(Controller2D))]
 public class PlayerInput : MonoBehaviour
 {
-    public enum ClimbingSide
+    private enum ClimbingSide
     {
         None,
         Left,
@@ -16,11 +16,16 @@ public class PlayerInput : MonoBehaviour
     private bool flip;
     public bool grounded;
     private bool Climbing = false;
-    public ClimbingSide CS;
+    private ClimbingSide CS;
+    private bool CanClimbing = false;
 
     private void Start()
     {
         CS = ClimbingSide.None;
+        if (!Climbing)
+        {
+            CanClimbing = true;
+        }
         rend = GetComponent<SpriteRenderer>();
         controller = GetComponent<Controller2D>();
         anim = GetComponent<Animator>();
@@ -34,6 +39,7 @@ public class PlayerInput : MonoBehaviour
         controller.SetDirectionalInput(directionalInput);
         anim.SetFloat("Speed", Mathf.Abs(controller.Velocity.x));
         anim.SetBool("Grounded", controller.Collisions.Below);
+        anim.SetBool("Climbing", Climbing);
         if (Input.GetAxisRaw("Horizontal") < 0)
             flip = true;
         else if (Input.GetAxisRaw("Horizontal") > 0)
@@ -47,12 +53,18 @@ public class PlayerInput : MonoBehaviour
         if (Input.GetButtonUp("Jump"))
             controller.OnJumpInputUp();
 
-        if (Climbing)
+        if (Climbing && !CanClimbing)
         {
-            controller.Gravity = 0;
-            controller.Velocity = Vector2.zero;
-            controller.Velocity.y = Input.GetAxisRaw("Vertical") * controller.ClimbSpeed;
+            if (Input.GetButtonDown("Jump") || (Input.GetAxisRaw("Horizontal") > 0 && CS == ClimbingSide.Left) || (Input.GetAxisRaw("Horizontal") < 0 && CS == ClimbingSide.Right))
+            {
+                Climbing = false;
+                CanClimbing = true;
+            }
+
+            
+                controller.Gravity = 0;
             controller.Velocity.x = 0;
+            controller.Velocity.y = Input.GetAxisRaw("Vertical") * controller.ClimbSpeed;
             controller.SetDirectionalInput(new Vector2(0, Input.GetAxisRaw("Vertical")));
             anim.speed = Mathf.Abs(Input.GetAxisRaw("Vertical") / controller.ClimbSpeed * 1.2f);
         }
@@ -69,8 +81,9 @@ public class PlayerInput : MonoBehaviour
         Debug.Log(collision.gameObject.tag);
         if (collision.gameObject.tag == "Ladder")
         {
-            anim.SetBool("Climbing", true);
+            
             Climbing = true;
+            CanClimbing = false;
             if (collision.transform.position.x < transform.position.x)
                 CS = ClimbingSide.Left;
             else if (collision.transform.position.x > transform.position.x)
@@ -83,8 +96,8 @@ public class PlayerInput : MonoBehaviour
         Debug.Log(collision.gameObject.tag);
         if (collision.gameObject.tag == "Ladder")
         {
-            anim.SetBool("Climbing", false);
             Climbing = false;
+            CanClimbing = true;
         }
     }
 }
