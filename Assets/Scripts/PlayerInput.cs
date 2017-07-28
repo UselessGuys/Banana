@@ -86,7 +86,6 @@ public class PlayerInput : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log(collision.gameObject.tag);
         if (collision.gameObject.tag == "Ladder")
         {
             
@@ -109,7 +108,6 @@ public class PlayerInput : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        Debug.Log(collision.gameObject.tag);
         if (collision.gameObject.tag == "Ladder")
         {
             Climbing = false;

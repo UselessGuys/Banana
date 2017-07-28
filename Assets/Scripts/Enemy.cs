@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Schema;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -33,6 +34,7 @@ namespace Assets.Scripts
 
         void Awake()
         {
+            _renderer = GetComponent<SpriteRenderer>();
             _stats = GetComponent<CharacterStats>();
             _controller = this.GetComponent<Controller2D>();
         }
@@ -48,6 +50,8 @@ namespace Assets.Scripts
 
         void Update()
         {
+            Scan();
+
 
             if (transform.position.x > RightBorder)
                 _rightDirection = false;
@@ -56,6 +60,11 @@ namespace Assets.Scripts
 
             CheckNoise();
 
+        }
+
+        private void Scan()
+        {
+            
         }
 
         void FixedUpdate()
@@ -71,6 +80,7 @@ namespace Assets.Scripts
             if (trigger.gameObject.tag == "Player")
             {
                 State = EnemyStates.Attack;
+                _renderer.color = Color.red;
             }
         }
 
@@ -80,12 +90,10 @@ namespace Assets.Scripts
             if (_rightDirection)
             {
                 directionalInput = new Vector2(_currentSpeed, 0);
-                Debug.Log("RD  " + transform.position.x);
             }
             else
             {
                 directionalInput = new Vector2(-_currentSpeed, 0);
-                Debug.Log("LD  " + transform.position.x);
             }
             _controller.SetDirectionalInput(directionalInput);
 
@@ -109,6 +117,5 @@ namespace Assets.Scripts
             }
         }
 
-        
     }
 }

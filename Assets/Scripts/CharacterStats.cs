@@ -18,6 +18,8 @@ namespace Assets.Scripts
         public int AttackSpeed;
 
         // Enemies Stats
-        public int HearRange; 
+        public int HearRange;
+        public float VisionRange;
+        public float VisionAngle;
     }
 }
