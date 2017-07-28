@@ -57,9 +57,6 @@ namespace Assets.Scripts
         {
             Scan();
             CheckNoise();
-
-            
-
         }
 
         void FixedUpdate()
