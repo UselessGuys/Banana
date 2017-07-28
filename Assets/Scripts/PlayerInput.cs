@@ -3,30 +3,20 @@
 [RequireComponent(typeof(Controller2D))]
 public class PlayerInput : MonoBehaviour
 {
-    private enum ClimbingSide
-    {
-        None,
-        Left,
-        Right
-    };
+
 
     private Animator anim;
     private Controller2D controller;
     private SpriteRenderer rend;
     private bool flip;
     public bool grounded;
-    private bool Climbing = false;
-    private bool ClimbingV2 = false;
-    private ClimbingSide CS;
-    private bool CanClimbing = false;
+    private bool ShowUseMsg;
+    public bool Climbing = false;
+    public bool ClimbingV2 = false;
 
     private void Start()
     {
-        CS = ClimbingSide.None;
-        if (!Climbing)
-        {
-            CanClimbing = true;
-        }
+        ShowUseMsg = false;
         rend = GetComponent<SpriteRenderer>();
         controller = GetComponent<Controller2D>();
         anim = GetComponent<Animator>();
@@ -38,16 +28,21 @@ public class PlayerInput : MonoBehaviour
         grounded = controller.Collisions.Below;
         var directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         controller.SetDirectionalInput(directionalInput);
+
         anim.SetFloat("Speed", Mathf.Abs(controller.Velocity.x));
         anim.SetBool("Grounded", controller.Collisions.Below);
         anim.SetBool("Climbing", Climbing);
         anim.SetBool("ClimbingV2", ClimbingV2);
+
         if (Input.GetAxisRaw("Horizontal") < 0)
             flip = true;
+
         else if (Input.GetAxisRaw("Horizontal") > 0)
             flip = false;
+
         if (Input.GetButtonDown("Jump"))
             controller.OnJumpInputDown();
+
         if (!Climbing)
             rend.flipX = flip;
 
@@ -55,18 +50,16 @@ public class PlayerInput : MonoBehaviour
         if (Input.GetButtonUp("Jump"))
             controller.OnJumpInputUp();
 
-        if ((Climbing || ClimbingV2) && !CanClimbing )
+        if ((Climbing || ClimbingV2)) //ToDO сделлать так что бы когда добираешься до верху  персонаж не падал
         {
-            if ((Climbing)&&(Input.GetButtonDown("Jump") || (Input.GetAxisRaw("Horizontal") > 0 && CS == ClimbingSide.Left) || (Input.GetAxisRaw("Horizontal") < 0 && CS == ClimbingSide.Right)))
+            if ((Climbing)&&(Input.GetButtonDown("Jump")))
             {
                 Climbing = false;
-                CanClimbing = true;
             }
 
-            if ((ClimbingV2) && (Input.GetButtonDown("Jump") || Mathf.Abs(Input.GetAxisRaw("Horizontal")) > 0.1f ))
+            if ((ClimbingV2) && (Input.GetButtonDown("Jump")))
             {
                 ClimbingV2 = false;
-                CanClimbing = true;
             }
 
 
@@ -86,39 +79,56 @@ public class PlayerInput : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log(collision.gameObject.tag);
         if (collision.gameObject.tag == "Ladder")
         {
-            
-            Climbing = true;
-            CanClimbing = false;
-            if (collision.transform.position.x < transform.position.x)
-                CS = ClimbingSide.Left;
-            else if (collision.transform.position.x > transform.position.x)
-                CS = ClimbingSide.Right;
+            ShowUseMsg = true;
         }
 
         if (collision.gameObject.tag == "LadderV2")
         {
-
-            ClimbingV2 = true;
-            CanClimbing = false;
-
+            ShowUseMsg = true;
         }
+
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        Debug.Log(collision.gameObject.tag);
         if (collision.gameObject.tag == "Ladder")
         {
+            if((Input.GetButtonUp("Use")))
+            {
+                Climbing = true;
+                
+            }
+        }
+
+        if (collision.gameObject.tag == "LadderV2")
+        {
+            if ((Input.GetButtonUp("Use")))
+            {
+                ClimbingV2 = true;
+                this.transform.position = new Vector2(collision.gameObject.transform.position.x, this.transform.position.y);
+            }
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Ladder")
+        {
+            
             Climbing = false;
-            CanClimbing = true;
+            ShowUseMsg = false;
         }
         if (collision.gameObject.tag == "LadderV2")
         {
             ClimbingV2 = false;
-            CanClimbing = true;
+            ShowUseMsg = false;
         }
+    }
+
+    private void OnGUI()
+    {
+        if (ShowUseMsg)
+            GUI.Label(new Rect(0, 0, 100, 100), "Нажмите E чтобы взаимодействовать");
     }
 }
