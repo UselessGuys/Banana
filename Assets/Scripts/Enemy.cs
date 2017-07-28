@@ -55,35 +55,12 @@ namespace Assets.Scripts
         void Update()
         {
             Scan();
-
+            CheckNoise();
 
             if (transform.position.x > RightBorder)
                 _rightDirection = false;
             if (transform.position.x < LeftBorder)
                 _rightDirection = true;
-
-            CheckNoise();
-
-        }
-
-        private void Scan()
-        {
-
-            _currentAngle += 5;
-            //ToDo Сделать независимым от фпс
-            if (_currentAngle > _stats.VisionAngle / 2)
-                _currentAngle -= _stats.VisionAngle;
-
-            _rayDirection = new Vector2(_rightDirection ? (float)Math.Cos(_currentAngle * 3.14 / 180) : -(float)Math.Cos(_currentAngle * 3.14 / 180), (float)Math.Sin(_currentAngle * 3.14 / 180));
-
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, _rayDirection * _stats.VisionRange, (int)_stats.VisionRange, LayerMask.GetMask("Player", "Ground"));
-            if (hit.collider != null && hit.collider.CompareTag("Player"))
-            {
-                _renderer.color = Color.magenta;
-            }
-            //if (hit.collider.CompareTag("Player")) _renderer.color = Color.magenta;
-           
-            Debug.DrawRay(transform.position, _rayDirection *_stats.VisionRange, Color.red, .1f);
 
         }
 
@@ -91,16 +68,40 @@ namespace Assets.Scripts
         {
             if (State == EnemyStates.Patrol)
                 Move();
+
+            if (State == EnemyStates.Attack)
+                _renderer.color = Color.blue;
         }
 
-        
-
-        void OnTriggerEnter2D(Collider2D trigger)
+        private void Scan()
         {
-            if (trigger.gameObject.tag == "Player")
+            _currentAngle += 5; //ToDo Сделать независимым от фпс
+
+            if (_currentAngle > _stats.VisionAngle / 2)
+                _currentAngle -= _stats.VisionAngle;
+
+            _rayDirection = new Vector2(
+                _rightDirection ? (float)Math.Cos(_currentAngle * Math.PI / 180) : -(float)Math.Cos(_currentAngle * Math.PI / 180), 
+                (float)Math.Sin(_currentAngle * Math.PI / 180));
+
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, _rayDirection * _stats.VisionRange, (int)_stats.VisionRange);
+
+            if (hit.collider != null && hit.collider.CompareTag("Player"))
             {
                 State = EnemyStates.Attack;
-                _renderer.color = Color.red;
+            }
+           
+            Debug.DrawRay(transform.position, _rayDirection *_stats.VisionRange, Color.red, .1f);
+
+        }
+
+        private void CheckNoise()
+        {
+            var players = GameObject.FindGameObjectsWithTag("Player");
+            foreach (var player in players)
+            {
+                if (Math.Abs(player.transform.position.x - this.transform.position.x) < _stats.HearRange * player.GetComponent<CharacterStats>().Noise)
+                        State = EnemyStates.Attack;
             }
         }
 
@@ -126,16 +127,7 @@ namespace Assets.Scripts
             _renderer.flipX = !_rightDirection;
         }
 
-        private void CheckNoise()
-        {
-            var players = GameObject.FindGameObjectsWithTag("Player");
-            foreach (var player in players)
-            {
-                if (Math.Abs(player.transform.position.x - this.transform.position.x) < _stats.HearRange)
-                    if (true) // ToDo Добавить Коэффицент слышимости у игрока
-                        State = EnemyStates.Attack;
-            }
-        }
+      
 
     }
 }
