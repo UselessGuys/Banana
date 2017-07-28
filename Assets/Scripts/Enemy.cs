@@ -31,6 +31,7 @@ namespace Assets.Scripts
         private float _currentSpeed;
         private Vector2 _rayDirection;
         private double _currentAngle;
+        private GameObject _target;
 
 
 
@@ -45,7 +46,7 @@ namespace Assets.Scripts
         {
             var random = new System.Random();
             _rightDirection = random.Next(1) == 1;
-            //ToDo Все мобы пойдут в одну сторону может быть.8
+            //ToDo Все мобы пойдут в одну сторону может быть.
 
             _currentAngle = 0;
 
@@ -57,20 +58,33 @@ namespace Assets.Scripts
             Scan();
             CheckNoise();
 
-            if (transform.position.x > RightBorder)
-                _rightDirection = false;
-            if (transform.position.x < LeftBorder)
-                _rightDirection = true;
+            
 
         }
 
         void FixedUpdate()
         {
-            if (State == EnemyStates.Patrol)
-                Move();
+            if (State == EnemyStates.Stay)
+                Move(0);
 
+            if (State == EnemyStates.Patrol)
+            {
+                if (transform.position.x > RightBorder)
+                    _rightDirection = false;
+                if (transform.position.x < LeftBorder)
+                    _rightDirection = true;
+
+                Move(_currentSpeed);
+            }
+                
             if (State == EnemyStates.Attack)
+            {
+                _rightDirection = _target.transform.position.x - this.transform.position.x > 0;
+                Move(_currentSpeed);
                 _renderer.color = Color.blue;
+            }
+
+           
         }
 
         private void Scan()
@@ -89,6 +103,7 @@ namespace Assets.Scripts
             if (hit.collider != null && hit.collider.CompareTag("Player"))
             {
                 State = EnemyStates.Attack;
+                _target = hit.collider.gameObject;
             }
            
             Debug.DrawRay(transform.position, _rayDirection *_stats.VisionRange, Color.red, .1f);
@@ -100,22 +115,23 @@ namespace Assets.Scripts
             var players = GameObject.FindGameObjectsWithTag("Player");
             foreach (var player in players)
             {
-                if (Math.Abs(player.transform.position.x - this.transform.position.x) < _stats.HearRange * player.GetComponent<CharacterStats>().Noise)
-                        State = EnemyStates.Attack;
+                if (Math.Abs(player.transform.position.x - this.transform.position.x) <
+                    _stats.HearRange * player.GetComponent<CharacterStats>().Noise)
+                {
+                    State = EnemyStates.Attack;
+                    _target = player;
+                }
             }
         }
 
-        private void Move()
+        private void Move(float speed)
         {
             Vector2 directionalInput;
             if (_rightDirection)
-            {
-                directionalInput = new Vector2(_currentSpeed, 0);
-            }
+                directionalInput = new Vector2(speed, 0);
             else
-            {
-                directionalInput = new Vector2(-_currentSpeed, 0);
-            }
+                directionalInput = new Vector2(-speed, 0);
+
             _controller.SetDirectionalInput(directionalInput);
 
 
