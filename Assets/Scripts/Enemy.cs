@@ -29,8 +29,10 @@ namespace Assets.Scripts
 
         private bool _rightDirection;
         private float _currentSpeed;
+        private Vector2 _rayDirection;
+        private double _currentAngle;
 
-        
+
 
         void Awake()
         {
@@ -43,7 +45,9 @@ namespace Assets.Scripts
         {
             var random = new System.Random();
             _rightDirection = random.Next(1) == 1;
-            //ToDo Все мобы пойдут в одну сторону может быть.
+            //ToDo Все мобы пойдут в одну сторону может быть.8
+
+            _currentAngle = 0;
 
             _currentSpeed = _stats.MoveSpeed;
         }
@@ -64,7 +68,23 @@ namespace Assets.Scripts
 
         private void Scan()
         {
-            
+
+            _currentAngle += 5;
+            //ToDo Сделать независимым от фпс
+            if (_currentAngle > _stats.VisionAngle / 2)
+                _currentAngle -= _stats.VisionAngle;
+
+            _rayDirection = new Vector2(_rightDirection ? (float)Math.Cos(_currentAngle * 3.14 / 180) : -(float)Math.Cos(_currentAngle * 3.14 / 180), (float)Math.Sin(_currentAngle * 3.14 / 180));
+
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, _rayDirection * _stats.VisionRange, (int)_stats.VisionRange, LayerMask.GetMask("Player", "Ground"));
+            if (hit.collider != null && hit.collider.CompareTag("Player"))
+            {
+                _renderer.color = Color.magenta;
+            }
+            //if (hit.collider.CompareTag("Player")) _renderer.color = Color.magenta;
+           
+            Debug.DrawRay(transform.position, _rayDirection *_stats.VisionRange, Color.red, .1f);
+
         }
 
         void FixedUpdate()
