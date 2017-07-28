@@ -87,22 +87,23 @@ public class PlayerInput : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Ladder")
+        Debug.Log("Enter " + collision.gameObject.tag);
+        if (collision.gameObject.CompareTag("Ladder"))
         {
             ShowUseMsg = true;
         }
 
-        if (collision.gameObject.tag == "LadderV2")
+        if (collision.gameObject.CompareTag("LadderV2"))
         {
             ShowUseMsg = true;
         }
 
-        if (collision.gameObject.tag == "ExitLadder")
+        if (collision.gameObject.CompareTag("ExitLadder"))
         {
             ExitLadder = true;
         }
 
-        if (collision.gameObject.tag == "EndLadder")
+        if (collision.gameObject.CompareTag("EndLadder"))
         {
             EndLadder = true;
             controller.Velocity.y = 0;
@@ -112,7 +113,7 @@ public class PlayerInput : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Ladder")
+        if (collision.gameObject.CompareTag("Ladder"))
         {
             if((Input.GetButtonUp("Use")))
             {
@@ -121,7 +122,7 @@ public class PlayerInput : MonoBehaviour
             }
         }
 
-        if (collision.gameObject.tag == "LadderV2")
+        if (collision.gameObject.CompareTag("LadderV2"))
         {
             if ((Input.GetButtonUp("Use")))
             {
@@ -132,25 +133,26 @@ public class PlayerInput : MonoBehaviour
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Ladder")
+        Debug.Log("Exit " + collision.gameObject.tag);
+        if (collision.gameObject.CompareTag("Ladder"))
         {
             
             Climbing = false;
             ShowUseMsg = false;
         }
 
-        if (collision.gameObject.tag == "LadderV2")
+        if (collision.gameObject.CompareTag("LadderV2"))
         {
             ClimbingV2 = false;
             ShowUseMsg = false;
         }
 
-        if (collision.gameObject.tag == "ExitLadder")
+        if (collision.gameObject.CompareTag("ExitLadder"))
         {
             ExitLadder = false;
         }
 
-        if (collision.gameObject.tag == "EndLadder")
+        if (collision.gameObject.CompareTag("EndLadder"))
         {
             EndLadder = false;
             
