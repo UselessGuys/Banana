@@ -13,6 +13,8 @@ public class PlayerInput : MonoBehaviour
     private bool ShowUseMsg;
     public bool Climbing = false;
     public bool ClimbingV2 = false;
+    public bool ExitLadder = false;
+    public bool EndLadder = false;
 
     private void Start()
     {
@@ -52,22 +54,28 @@ public class PlayerInput : MonoBehaviour
 
         if ((Climbing || ClimbingV2)) //ToDO сделлать так что бы когда добираешься до верху  персонаж не падал
         {
-            if ((Climbing)&&(Input.GetButtonDown("Jump")))
+            if ((Input.GetButtonDown("Jump") || Input.GetAxisRaw("Horizontal") != 0) && ExitLadder)
             {
                 Climbing = false;
-            }
-
-            if ((ClimbingV2) && (Input.GetButtonDown("Jump")))
-            {
                 ClimbingV2 = false;
             }
-
-
             controller.Gravity = 0;
             controller.Velocity.x = 0;
-            controller.Velocity.y = Input.GetAxisRaw("Vertical") * controller.ClimbSpeed;
             controller.SetDirectionalInput(new Vector2(0, Input.GetAxisRaw("Vertical")));
-            anim.speed = Mathf.Abs(Input.GetAxisRaw("Vertical") / controller.ClimbSpeed * 1.2f);
+            if (!EndLadder)
+            {
+                controller.Velocity.y = Input.GetAxisRaw("Vertical") * controller.ClimbSpeed;
+            }
+            else
+            {
+                if (Input.GetAxisRaw("Vertical") < 0)
+                {
+                    controller.Velocity.y = Input.GetAxisRaw("Vertical") * controller.ClimbSpeed;
+                }
+            }
+            
+            
+            anim.speed = Mathf.Abs(controller.Velocity.y /2.2f / controller.ClimbSpeed);
         }
         else
         {
@@ -87,6 +95,17 @@ public class PlayerInput : MonoBehaviour
         if (collision.gameObject.tag == "LadderV2")
         {
             ShowUseMsg = true;
+        }
+
+        if (collision.gameObject.tag == "ExitLadder")
+        {
+            ExitLadder = true;
+        }
+
+        if (collision.gameObject.tag == "EndLadder")
+        {
+            EndLadder = true;
+            controller.Velocity.y = 0;
         }
 
     }
@@ -119,10 +138,22 @@ public class PlayerInput : MonoBehaviour
             Climbing = false;
             ShowUseMsg = false;
         }
+
         if (collision.gameObject.tag == "LadderV2")
         {
             ClimbingV2 = false;
             ShowUseMsg = false;
+        }
+
+        if (collision.gameObject.tag == "ExitLadder")
+        {
+            ExitLadder = false;
+        }
+
+        if (collision.gameObject.tag == "EndLadder")
+        {
+            EndLadder = false;
+            
         }
     }
 
