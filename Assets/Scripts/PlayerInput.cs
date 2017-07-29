@@ -15,10 +15,12 @@ public class PlayerInput : MonoBehaviour
     public bool ClimbingV2 = false;
     public bool ExitLadder = false;
     public bool EndLadder = false;
+    public GameObject torch;
 
     private void Start()
     {
         ShowUseMsg = false;
+        torch = GameObject.Find("Player/Torch");
         rend = GetComponent<SpriteRenderer>();
         controller = GetComponent<Controller2D>();
         anim = GetComponent<Animator>();
@@ -36,11 +38,17 @@ public class PlayerInput : MonoBehaviour
         anim.SetBool("Climbing", Climbing);
         anim.SetBool("ClimbingV2", ClimbingV2);
 
+        
+
         if (Input.GetAxisRaw("Horizontal") < 0)
+        {
             flip = true;
+        }
 
         else if (Input.GetAxisRaw("Horizontal") > 0)
+        {
             flip = false;
+        }
 
         if (Input.GetButtonDown("Jump"))
             controller.OnJumpInputDown();
@@ -133,7 +141,7 @@ public class PlayerInput : MonoBehaviour
             if ((Input.GetButtonUp("Use")))
             {
                 ClimbingV2 = true;
-                this.transform.position = new Vector2(collision.gameObject.transform.position.x, this.transform.position.y);
+                this.transform.position = new Vector3(collision.gameObject.transform.position.x, this.transform.position.y, this.transform.position.z);
             }
         }
     }
