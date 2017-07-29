@@ -83,6 +83,9 @@ public class PlayerInput : MonoBehaviour
             anim.speed = 1;
             controller.SetDirectionalInput(directionalInput);
         }
+
+
+
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -109,6 +112,7 @@ public class PlayerInput : MonoBehaviour
             controller.Velocity.y = 0;
         }
 
+
     }
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -121,6 +125,8 @@ public class PlayerInput : MonoBehaviour
                 
             }
         }
+
+
 
         if (collision.gameObject.CompareTag("LadderV2"))
         {
@@ -157,6 +163,8 @@ public class PlayerInput : MonoBehaviour
             EndLadder = false;
             
         }
+
+
     }
 
     private void OnGUI()
