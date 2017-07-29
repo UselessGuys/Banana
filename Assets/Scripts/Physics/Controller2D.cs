@@ -2,6 +2,13 @@
 [RequireComponent(typeof(BoxCollider2D))]
 public class Controller2D : MonoBehaviour
 {
+    #region MyCode
+    [HideInInspector]
+    public float ObjectWidth;
+    [HideInInspector]
+    public float ObjectHeight;
+     #endregion
+
     public LayerMask CollisionMask;
 
     public const float SkinWidth = .015f;
@@ -62,6 +69,8 @@ public class Controller2D : MonoBehaviour
     public virtual void Awake()
     {
         Coll = GetComponent<BoxCollider2D>();
+        ObjectHeight = transform.localScale.y * Coll.size.y;
+        ObjectWidth = transform.localScale.x * Coll.size.x;
     }
 
     public virtual void Start()

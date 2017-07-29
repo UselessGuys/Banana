@@ -17,11 +17,13 @@ namespace Assets.Scripts
 
     internal class Enemy : MonoBehaviour
     {
+        public float HorizontalRaySpacing = 0.5f;
+        private const float RayLength = 1f;
+
         public int LeftBorder;
         public int RightBorder;
 
         public EnemyStates State;
-        //public Animator Animator;
 
         private CharacterStats _stats;
         private Controller2D _controller;   
@@ -29,11 +31,13 @@ namespace Assets.Scripts
 
         private bool _rightDirection;
         private float _currentSpeed;
+        private float _currentJumpSpeed;
         private Vector2 _rayDirection;
         private double _currentAngle;
         private GameObject _target;
 
-
+        private float rayCount;
+        private float realRaySpacing;
 
         void Awake()
         {
@@ -49,8 +53,11 @@ namespace Assets.Scripts
             //ToDo Все мобы пойдут в одну сторону может быть.
 
             _currentAngle = 0;
-
             _currentSpeed = _stats.MoveSpeed;
+
+
+            rayCount = (float) Math.Round(_controller.ObjectHeight / HorizontalRaySpacing);
+            realRaySpacing = _controller.ObjectHeight / rayCount;
         }
 
         void Update()
@@ -78,10 +85,8 @@ namespace Assets.Scripts
             {
                 _rightDirection = _target.transform.position.x - this.transform.position.x > 0;
                 Move(_currentSpeed);
-                _renderer.color = Color.blue;
+                _renderer.color = Color.red;
             }
-
-           
         }
 
         private void Scan()
@@ -123,24 +128,37 @@ namespace Assets.Scripts
 
         private void Move(float speed)
         {
+            CheckObstacles();
+
             Vector2 directionalInput;
             if (_rightDirection)
-                directionalInput = new Vector2(speed, 0);
+                directionalInput = new Vector2(speed, _currentJumpSpeed);
             else
-                directionalInput = new Vector2(-speed, 0);
+                directionalInput = new Vector2(-speed, _currentJumpSpeed);
 
             _controller.SetDirectionalInput(directionalInput);
-
-
-
-            //Animator.SetFloat("_currentSpeed", Mathf.Abs(_controller.Velocity.x));
-            //Animator.SetBool("Grounded", _controller.Collisions.Below);
-
 
             _renderer.flipX = !_rightDirection;
         }
 
-      
+        private void CheckObstacles()
+        {
+            for (int i = 0; i < rayCount + 1; i++)
+            {
+                Vector2 rayOrigin = (!_rightDirection)
+                    ? _controller.raycastOrigins.BottomLeft
+                    : _controller.raycastOrigins.BottomRight;
+                rayOrigin += Vector2.up * (realRaySpacing * i);
+                RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * (_rightDirection ? 1 : -1), RayLength);
 
+                Debug.DrawRay(rayOrigin, Vector2.right * (_rightDirection ? 1 : -1), Color.blue);
+
+                if (hit.collider != null && hit.collider.CompareTag("Ground"))
+                {
+                    _currentJumpSpeed = _stats.JumpHeight;
+                }
+                else _currentJumpSpeed = 0;
+            }
+        }
     }
 }
