@@ -31,7 +31,6 @@ namespace Assets.Scripts
 
         private bool _rightDirection;
         private float _currentSpeed;
-        private float _currentJumpSpeed;
         private Vector2 _rayDirection;
         private double _currentAngle;
         private GameObject _target;
@@ -128,13 +127,15 @@ namespace Assets.Scripts
 
         private void Move(float speed)
         {
-            CheckObstacles();
+            if (Math.Abs(speed) > 0)
+                CheckObstacles();
+            else _controller.OnJumpInputUp();
 
             Vector2 directionalInput;
             if (_rightDirection)
-                directionalInput = new Vector2(speed, _currentJumpSpeed);
+                directionalInput = new Vector2(speed, 0);
             else
-                directionalInput = new Vector2(-speed, _currentJumpSpeed);
+                directionalInput = new Vector2(-speed, 0);
 
             _controller.SetDirectionalInput(directionalInput);
 
@@ -155,9 +156,8 @@ namespace Assets.Scripts
 
                 if (hit.collider != null && hit.collider.CompareTag("Ground"))
                 {
-                    _currentJumpSpeed = _stats.JumpHeight;
+                    _controller.OnJumpInputDown(); //ToDo Сила прыжка должна зависеть от статов
                 }
-                else _currentJumpSpeed = 0;
             }
         }
     }
