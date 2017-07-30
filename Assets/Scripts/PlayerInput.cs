@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-
 [RequireComponent(typeof(Controller2D))]
 public class PlayerInput : MonoBehaviour
 {
@@ -57,8 +56,10 @@ public class PlayerInput : MonoBehaviour
             rend.flipX = flip;
 
 
-        if (Input.GetButtonUp("Jump"))
-            controller.OnJumpInputUp();
+        if ((Input.GetButtonUp("Use")))
+        {
+            Debug.Log("Use");
+        }
 
         if ((Climbing || ClimbingV2)) //ToDO сделлать так что бы когда добираешься до верху  персонаж не падал
         {
@@ -114,7 +115,7 @@ public class PlayerInput : MonoBehaviour
             ExitLadder = true;
         }
 
-        if (collision.gameObject.CompareTag("EndLadder"))
+        if (collision.gameObject.CompareTag("EndLadder")  && (Climbing || ClimbingV2))
         {
             EndLadder = true;
             controller.Velocity.y = 0;
@@ -130,7 +131,7 @@ public class PlayerInput : MonoBehaviour
             if((Input.GetButtonUp("Use")))
             {
                 Climbing = true;
-                
+                Debug.Log("Use");
             }
         }
 
