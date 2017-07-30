@@ -87,7 +87,7 @@ namespace Assets.Scripts
                 _renderer.color = Color.red;
             }
         }
-
+        
         private void Scan()
         {
             _currentAngle += 5; //ToDo Сделать независимым от фпс
@@ -117,7 +117,7 @@ namespace Assets.Scripts
             foreach (var player in players)
             {
                 if (Math.Abs(player.transform.position.x - this.transform.position.x) <
-                    _stats.HearRange * player.GetComponent<CharacterStats>().Noise)
+                    _stats.HearRange * player.GetComponent<CharacterStats>().Noise) //ToDo растояние не из центра персонажа
                 {
                     State = EnemyStates.Attack;
                     _target = player;
