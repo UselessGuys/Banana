@@ -8,18 +8,17 @@ public class PlayerInput : MonoBehaviour
     private Controller2D controller;
     private SpriteRenderer rend;
     private bool flip;
-    public bool grounded;
     private bool ShowUseMsg;
+
+    public bool grounded;
     public bool Climbing = false;
     public bool ClimbingV2 = false;
     public bool ExitLadder = false;
     public bool EndLadder = false;
-    public GameObject torch;
 
     private void Start()
     {
         ShowUseMsg = false;
-        torch = GameObject.Find("Player/Torch");
         rend = GetComponent<SpriteRenderer>();
         controller = GetComponent<Controller2D>();
         anim = GetComponent<Animator>();
@@ -61,7 +60,7 @@ public class PlayerInput : MonoBehaviour
             Debug.Log("Use");
         }
 
-        if ((Climbing || ClimbingV2)) //ToDO сделлать так что бы когда добираешься до верху  персонаж не падал
+        if ((Climbing || ClimbingV2)) 
         {
             if ((Input.GetButtonDown("Jump") || Input.GetAxisRaw("Horizontal") != 0) && ExitLadder)
             {
@@ -96,6 +95,7 @@ public class PlayerInput : MonoBehaviour
 
 
     }
+
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -172,8 +172,7 @@ public class PlayerInput : MonoBehaviour
             EndLadder = false;
             
         }
-
-
+        
     }
 
     private void OnGUI()
