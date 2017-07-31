@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Physics;
+using UnityEngine;
 
 [RequireComponent(typeof(Controller2D))]
 public class PlayerInput : MonoBehaviour
