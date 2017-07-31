@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Physics;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -87,7 +88,7 @@ namespace Assets.Scripts
                 directionalInput = new Vector2(-_currentSpeed, 0);
                 Debug.Log("LD  " + transform.position.x);
             }
-            _controller.SetDirectionalInput(directionalInput);
+            _controller.DirectionalInput = directionalInput;
 
 
 

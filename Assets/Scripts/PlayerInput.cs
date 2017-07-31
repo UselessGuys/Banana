@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Physics;
+using UnityEngine;
 [RequireComponent(typeof(Controller2D))]
 public class PlayerInput : MonoBehaviour
 {
@@ -29,7 +30,7 @@ public class PlayerInput : MonoBehaviour
     {
         grounded = controller.Collisions.Below;
         var directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        controller.SetDirectionalInput(directionalInput);
+        controller.DirectionalInput = directionalInput;
 
         anim.SetFloat("Speed", Mathf.Abs(controller.Velocity.x));
         anim.SetBool("Grounded", controller.Collisions.Below);
@@ -49,7 +50,7 @@ public class PlayerInput : MonoBehaviour
         }
 
         if (Input.GetButtonDown("Jump"))
-            controller.OnJumpInputDown();
+            controller.Jump();
 
         if (!Climbing)
             rend.flipX = flip;
@@ -69,7 +70,7 @@ public class PlayerInput : MonoBehaviour
             }
             controller.Gravity = 0;
             controller.Velocity.x = 0;
-            controller.SetDirectionalInput(new Vector2(0, Input.GetAxisRaw("Vertical")));
+            controller.DirectionalInput = new Vector2(0, Input.GetAxisRaw("Vertical"));
             if (!EndLadder)
             {
                 controller.Velocity.y = Input.GetAxisRaw("Vertical") * controller.ClimbSpeed;
@@ -89,7 +90,7 @@ public class PlayerInput : MonoBehaviour
         {
             controller.Gravity = -(2 * controller.MaxJumpHeight) / Mathf.Pow(controller.TimeToJumpApex, 2);
             anim.speed = 1;
-            controller.SetDirectionalInput(directionalInput);
+            controller.DirectionalInput = directionalInput;
         }
 
 
