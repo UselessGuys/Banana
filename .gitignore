@@ -9,7 +9,8 @@
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
-
+*.exe
+*.dll
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -294,3 +295,4 @@ Thumbs.db
 
 
 /VSCode/
+ProjectSettings/TagManager.asset
