@@ -36,39 +36,53 @@ namespace Physics
 
         private const float SkinWidth = .015f;
         private const float DstBetweenRays = .25f;
-        private float _maxClimbAngle = 80f;
-        private float _maxDescendAngle = 80f;
-        private float _moveSpeed = 6f;  
-        private bool _isDoubleJumping;
-        private float _maxJumpVelocity;
-        
+        private const float MaxClimbAngle = 80f;
+        private const float MaxDescendAngle = 80f;
+        private const float TimeToJumpApex = 0.4f;
+        private const float FallingThroughPlatformResetTimer = 0.1f;
 
-        public LayerMask CollisionMask;
-        public float FallingThroughPlatformResetTimer = 0.1f;
+        private int _horizontalRayCount;
+        private int _verticalRayCount;
+        private float _horizontalRaySpacing;
+        private float _verticalRaySpacing;            
+        private bool _isDoubleJumping;
+        private float _maxJumpVelocity;      
+        private BoxCollider2D _collider;      
+        private Vector2 _playerInput;
+
+
+
+        public LayerMask CollisionMask;        
         public float MaxJumpHeight = 4f;
         public float ClimbSpeed = 3f;
-        public float MinJumpHeight = 1f;
-        public float TimeToJumpApex = .4f;
         public bool CanDoubleJump;
 
-        [HideInInspector] public RaycastOrigins RaycastOrigin;
-        [HideInInspector] public Vector2 DirectionalInput { set; get; }
-        [HideInInspector] public CollisionInfo Collisions;
         [HideInInspector] public float Gravity;
         [HideInInspector] public Vector2 Velocity;
-        [HideInInspector] public int HorizontalRayCount;
-        [HideInInspector] public int VerticalRayCount;
-        [HideInInspector] public float HorizontalRaySpacing;
-        [HideInInspector] public float VerticalRaySpacing;
-        [HideInInspector] public BoxCollider2D Collider;
-        [HideInInspector] public Vector2 PlayerInput;
+        [HideInInspector] public RaycastOrigins RaycastOrigin;       
+        [HideInInspector] public CollisionInfo Collisions;         
         [HideInInspector] public float ObjectHeight;
+        [HideInInspector] public Vector2 DirectionalInput { set; get; }
 
+        public void Jump()
+        {
+            if (Collisions.Below)
+            {
+                Velocity.y = _maxJumpVelocity;
+                _isDoubleJumping = false;
+            }
+            if (CanDoubleJump && !Collisions.Below && !_isDoubleJumping)
+            {
+                Velocity.y = _maxJumpVelocity;
+                _isDoubleJumping = true;
+            }
+        }
 
         private void Awake()
         {
-            Collider = GetComponent<BoxCollider2D>();
-            ObjectHeight = transform.localScale.y * Collider.size.y;
+            _collider = GetComponent<BoxCollider2D>();
+
+            ObjectHeight = transform.localScale.y * _collider.size.y;
         }
 
         private void Start()
@@ -77,8 +91,10 @@ namespace Physics
             Collisions.FaceDirection = 1;
 
             Gravity = -(2 * MaxJumpHeight) / Mathf.Pow(TimeToJumpApex, 2);
-            _maxJumpVelocity = Mathf.Abs(Gravity) * TimeToJumpApex;
+            _maxJumpVelocity = Mathf.Abs(Gravity) * TimeToJumpApex;      
         }
+
+        
 
         private void Update()
         {
@@ -90,12 +106,12 @@ namespace Physics
                 Velocity.y = 0f;
         }
 
-        public void Move(Vector2 moveAmount, Vector2 input = default(Vector2), bool standingOnPlatform = false)
+        private void Move(Vector2 moveAmount, Vector2 input = default(Vector2), bool standingOnPlatform = false)
         {
             UpdateRaycastOrigins();
             Collisions.Reset();
             Collisions.MoveAmountOld = moveAmount;
-            PlayerInput = input;
+            _playerInput = input;
 
             if (moveAmount.x != 0)
             {
@@ -122,20 +138,6 @@ namespace Physics
             }
         }
 
-        public void Jump()
-        {  
-            if (Collisions.Below)
-            {
-                Velocity.y = _maxJumpVelocity;
-                _isDoubleJumping = false;
-            }
-            if (CanDoubleJump && !Collisions.Below && !_isDoubleJumping)
-            {
-                Velocity.y = _maxJumpVelocity;
-                _isDoubleJumping = true;
-            }
-        }
-
         private void HorizontalCollisions(ref Vector2 moveAmount)
         {
             float directionX = Collisions.FaceDirection;
@@ -146,10 +148,10 @@ namespace Physics
                 rayLength = 2 * SkinWidth;
             }
 
-            for (int i = 0; i < HorizontalRayCount; i++)
+            for (int i = 0; i < _horizontalRayCount; i++)
             {
                 Vector2 rayOrigin = (directionX == -1) ? RaycastOrigin.BottomLeft : RaycastOrigin.BottomRight;
-                rayOrigin += Vector2.up * (HorizontalRaySpacing * i);
+                rayOrigin += Vector2.up * (_horizontalRaySpacing * i);
                 RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, CollisionMask);
 
                 Debug.DrawRay(rayOrigin, Vector2.right * directionX, Color.red);
@@ -159,7 +161,7 @@ namespace Physics
 
                     float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 
-                    if (i == 0 && slopeAngle <= _maxClimbAngle)
+                    if (i == 0 && slopeAngle <= MaxClimbAngle)
                     {
                         if (Collisions.DescendingSlope)
                         {
@@ -176,7 +178,7 @@ namespace Physics
                         moveAmount.x += distanceToSlopeStart * directionX;
                     }
 
-                    if (!Collisions.ClimbingSlope || slopeAngle > _maxClimbAngle)
+                    if (!Collisions.ClimbingSlope || slopeAngle > MaxClimbAngle)
                     {
                         moveAmount.x = (hit.distance - SkinWidth) * directionX;
                         rayLength = hit.distance;
@@ -218,7 +220,7 @@ namespace Physics
             if (hit)
             {
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-                if (slopeAngle != 0 && slopeAngle <= _maxDescendAngle)
+                if (slopeAngle != 0 && slopeAngle <= MaxDescendAngle)
                 {
                     if (Mathf.Sign(hit.normal.x) == directionX)
                     {
@@ -243,10 +245,10 @@ namespace Physics
             float directionY = Mathf.Sign(moveAmount.y);
             float rayLength = Mathf.Abs(moveAmount.y) + SkinWidth;
 
-            for (int i = 0; i < VerticalRayCount; i++)
+            for (int i = 0; i < _verticalRayCount; i++)
             {
                 Vector2 rayOrigin = (directionY == -1) ? RaycastOrigin.BottomLeft : RaycastOrigin.TopLeft;
-                rayOrigin += Vector2.right * (VerticalRaySpacing * i + moveAmount.x);
+                rayOrigin += Vector2.right * (_verticalRaySpacing * i + moveAmount.x);
                 RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, CollisionMask);
 
                 Debug.DrawRay(rayOrigin, Vector2.up * directionY, Color.red);
@@ -263,7 +265,7 @@ namespace Physics
                         {
                             continue;
                         }
-                        if (PlayerInput.y == -1)
+                        if (_playerInput.y == -1)
                         {
                             Collisions.FallingThroughPlatform = true;
                             Invoke("ResetFallingThroughPlatform", FallingThroughPlatformResetTimer);
@@ -309,14 +311,13 @@ namespace Physics
 
         private void CalculateVelocity()
         {
-            float targetVelocityX = DirectionalInput.x * _moveSpeed;
-            Velocity.x = targetVelocityX;
+            Velocity.x = DirectionalInput.x;
             Velocity.y += Gravity * Time.deltaTime;
         }
 
         private void UpdateRaycastOrigins()
         {
-            Bounds bounds = Collider.bounds;
+            Bounds bounds = _collider.bounds;
             bounds.Expand(SkinWidth * -2);
 
             RaycastOrigin.BottomLeft = new Vector2(bounds.min.x, bounds.min.y);
@@ -327,18 +328,18 @@ namespace Physics
    
         private void CalculateRaySpacing()
         {
-            Bounds bounds = Collider.bounds;
+            Bounds bounds = _collider.bounds;
             bounds.Expand(SkinWidth * -2);
 
             float boundsWidth = bounds.size.x;
             float boundsHeight = bounds.size.y;
 
 
-            HorizontalRayCount = Mathf.RoundToInt(boundsHeight / DstBetweenRays);
-            VerticalRayCount = Mathf.RoundToInt(boundsWidth / DstBetweenRays);
+            _horizontalRayCount = Mathf.RoundToInt(boundsHeight / DstBetweenRays);
+            _verticalRayCount = Mathf.RoundToInt(boundsWidth / DstBetweenRays);
 
-            HorizontalRaySpacing = bounds.size.y / (HorizontalRayCount - 1);
-            VerticalRaySpacing = bounds.size.x / (VerticalRayCount - 1);
+            _horizontalRaySpacing = bounds.size.y / (_horizontalRayCount - 1);
+            _verticalRaySpacing = bounds.size.x / (_verticalRayCount - 1);
         }
     }
 }

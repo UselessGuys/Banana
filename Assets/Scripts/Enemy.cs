@@ -43,7 +43,7 @@ namespace Assets.Scripts
         {
             _renderer = GetComponent<SpriteRenderer>();
             _stats = GetComponent<CharacterStats>();
-            _controller = this.GetComponent<Controller2D>();
+            _controller = GetComponent<Controller2D>();
         }
 
         void Start()
@@ -104,8 +104,8 @@ namespace Assets.Scripts
 
             if (hit.collider != null && hit.collider.CompareTag("Player"))
             {
-                State = EnemyStates.Attack;
                 _target = hit.collider.gameObject;
+                State = EnemyStates.Attack;
             }
            
             Debug.DrawRay(transform.position, _rayDirection *_stats.VisionRange, Color.red, .1f);

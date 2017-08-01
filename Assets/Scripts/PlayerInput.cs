@@ -10,10 +10,10 @@ public class PlayerInput : MonoBehaviour
     private bool ShowUseMsg;
 
     public bool grounded;
-    public bool Climbing = false;
-    public bool ClimbingV2 = false;
-    public bool ExitLadder = false;
-    public bool EndLadder = false;
+    public bool Climbing;
+    public bool ClimbingV2;
+    public bool ExitLadder;
+    public bool EndLadder;
 
     private void Start()
     {
@@ -86,7 +86,7 @@ public class PlayerInput : MonoBehaviour
         }
         else
         {
-            controller.Gravity = -(2 * controller.MaxJumpHeight) / Mathf.Pow(controller.TimeToJumpApex, 2);
+            controller.Gravity = -(2 * controller.MaxJumpHeight) / Mathf.Pow(0.4f, 2);
             anim.speed = 1;
             controller.DirectionalInput = directionalInput;
         }
