@@ -18,7 +18,7 @@ namespace Assets.Scripts
 
     internal class Enemy : MonoBehaviour
     {
-        public float HorizontalRaySpacing = 0.5f;
+        private const float HorizontalRaySpacing = 0.5f;
         private const float RayLength = 1f;
 
         public int LeftBorder;
@@ -130,7 +130,6 @@ namespace Assets.Scripts
         {
             if (Math.Abs(speed) > 0)
                 CheckObstacles();
-            else _controller.Jump();
 
             Vector2 directionalInput;
             if (_rightDirection)
@@ -138,7 +137,7 @@ namespace Assets.Scripts
             else
                 directionalInput = new Vector2(-speed, 0);
 
-            _controller.SetDirectionalInput(directionalInput);
+            _controller.DirectionalInput = directionalInput;
 
             _renderer.flipX = !_rightDirection;
         }
@@ -148,8 +147,8 @@ namespace Assets.Scripts
             for (int i = 0; i < rayCount + 1; i++)
             {
                 Vector2 rayOrigin = (!_rightDirection)
-                    ? _controller._raycastOrigins.BottomLeft
-                    : _controller._raycastOrigins.BottomRight;
+                    ? _controller.RaycastOrigin.BottomLeft
+                    : _controller.RaycastOrigin.BottomRight;
                 rayOrigin += Vector2.up * (realRaySpacing * i);
                 RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * (_rightDirection ? 1 : -1), RayLength);
 
