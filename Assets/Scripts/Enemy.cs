@@ -131,12 +131,13 @@ namespace Assets.Scripts
             if (Math.Abs(speed) > 0)
                 CheckObstacles();
 
+            Vector2 directionalInput;
             if (_rightDirection)
-                _controller.Velocity.x = speed;
+                directionalInput = new Vector2(speed, 0);
             else
-                _controller.Velocity.x = -speed;
+                directionalInput = new Vector2(-speed, 0);
 
-
+            _controller.DirectionalInput = directionalInput;
 
             _renderer.flipX = !_rightDirection;
         }
@@ -155,7 +156,7 @@ namespace Assets.Scripts
 
                 if (hit.collider != null && hit.collider.CompareTag("Ground"))
                 {
-                    _controller.Jump(_stats.JumpHeight); 
+                    _controller.Jump(); //ToDo Сила прыжка должна зависеть от статов
                 }
             }
         }
