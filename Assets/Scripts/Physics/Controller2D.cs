@@ -1,6 +1,4 @@
-﻿// Velocity, Gravity, MoveAcrossPlatform
-// Method "Jump"
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Physics
 {
@@ -40,21 +38,30 @@ namespace Physics
         private const float DstBetweenRays = .25f;
         private const float MaxClimbAngle = 80f;
         private const float MaxDescendAngle = 80f;
+        private const float TimeToJumpApex = 0.4f;
         private const float FallingThroughPlatformResetTimer = 0.1f;
 
         private int _horizontalRayCount;
         private int _verticalRayCount;
         private float _horizontalRaySpacing;
         private float _verticalRaySpacing;            
+<<<<<<< HEAD
         private bool _isDoubleJumping;      
         private BoxCollider2D _collider;
         private CollisionInfo _collisions;
        
 
-        public LayerMask CollisionMask; //ToDo Константой
+
+
+
+        public LayerMask CollisionMask;        
+        public float MaxJumpHeight = 4f;
+        public float ClimbSpeed = 3f;
         public bool CanDoubleJump;
 
+        [HideInInspector] public float Gravity;
         [HideInInspector] public Vector2 Velocity;
+<<<<<<< HEAD
         [HideInInspector] public float Gravity = -25;
         [HideInInspector] public bool MoveAcrossPlatform { get; set; }
 
@@ -63,16 +70,17 @@ namespace Physics
         [HideInInspector] public RaycastOrigins RaycastOrigin;
         
 
-        public void Jump(float jumpHeight)
+
+        public void Jump()
         {
-            if (_collisions.Below)
+            if (Collisions.Below)
             {
-                Velocity.y = jumpHeight;
+                Velocity.y = _maxJumpVelocity;
                 _isDoubleJumping = false;
             }
-            if (CanDoubleJump && !_collisions.Below && !_isDoubleJumping)
+            if (CanDoubleJump && !Collisions.Below && !_isDoubleJumping)
             {
-                Velocity.y = jumpHeight;
+                Velocity.y = _maxJumpVelocity;
                 _isDoubleJumping = true;
             }
         }
@@ -81,14 +89,18 @@ namespace Physics
         {
             _collider = GetComponent<BoxCollider2D>();
 
+<<<<<<< HEAD
             Grounded = _collisions.Below;
+
         }
 
         private void Start()
         {
             CalculateRaySpacing();
-            _collisions.FaceDirection = 1;
-     
+            Collisions.FaceDirection = 1;
+
+            Gravity = -(2 * MaxJumpHeight) / Mathf.Pow(TimeToJumpApex, 2);
+            _maxJumpVelocity = Mathf.Abs(Gravity) * TimeToJumpApex;      
         }
 
         
@@ -97,21 +109,22 @@ namespace Physics
         {
             CalculateVelocity();
 
-            Move(Velocity * Time.deltaTime);
+            Move(Velocity * Time.deltaTime, DirectionalInput);
 
-            if (_collisions.Above || _collisions.Below)
+            if (Collisions.Above || Collisions.Below)
                 Velocity.y = 0f;
         }
 
-        private void Move(Vector2 moveAmount)
+        private void Move(Vector2 moveAmount, Vector2 input = default(Vector2), bool standingOnPlatform = false)
         {
             UpdateRaycastOrigins();
-            _collisions.Reset();
-            _collisions.MoveAmountOld = moveAmount;
+            Collisions.Reset();
+            Collisions.MoveAmountOld = moveAmount;
+            _playerInput = input;
 
             if (moveAmount.x != 0)
             {
-                _collisions.FaceDirection = (int)Mathf.Sign(moveAmount.x);
+                Collisions.FaceDirection = (int)Mathf.Sign(moveAmount.x);
             }
 
             if (moveAmount.y < 0)
@@ -127,11 +140,16 @@ namespace Physics
             }
 
             transform.Translate(moveAmount);
+
+            if (standingOnPlatform)
+            {
+                Collisions.Below = true;
+            }
         }
 
         private void HorizontalCollisions(ref Vector2 moveAmount)
         {
-            float directionX = _collisions.FaceDirection;
+            float directionX = Collisions.FaceDirection;
             float rayLength = Mathf.Abs(moveAmount.x) + SkinWidth;
 
             if (Mathf.Abs(moveAmount.x) < SkinWidth)
@@ -154,13 +172,13 @@ namespace Physics
 
                     if (i == 0 && slopeAngle <= MaxClimbAngle)
                     {
-                        if (_collisions.DescendingSlope)
+                        if (Collisions.DescendingSlope)
                         {
-                            _collisions.DescendingSlope = false;
-                            moveAmount = _collisions.MoveAmountOld;
+                            Collisions.DescendingSlope = false;
+                            moveAmount = Collisions.MoveAmountOld;
                         }
                         float distanceToSlopeStart = 0f;
-                        if (slopeAngle != _collisions.SlopeAngleOld)
+                        if (slopeAngle != Collisions.SlopeAngleOld)
                         {
                             distanceToSlopeStart = hit.distance - SkinWidth;
                             moveAmount.x -= distanceToSlopeStart * directionX;
@@ -169,18 +187,18 @@ namespace Physics
                         moveAmount.x += distanceToSlopeStart * directionX;
                     }
 
-                    if (!_collisions.ClimbingSlope || slopeAngle > MaxClimbAngle)
+                    if (!Collisions.ClimbingSlope || slopeAngle > MaxClimbAngle)
                     {
                         moveAmount.x = (hit.distance - SkinWidth) * directionX;
                         rayLength = hit.distance;
 
-                        if (_collisions.ClimbingSlope)
+                        if (Collisions.ClimbingSlope)
                         {
-                            moveAmount.y = Mathf.Tan(_collisions.SlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(moveAmount.x);
+                            moveAmount.y = Mathf.Tan(Collisions.SlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(moveAmount.x);
                         }
 
-                        _collisions.Left = directionX == -1;
-                        _collisions.Right = directionX == 1;
+                        Collisions.Left = directionX == -1;
+                        Collisions.Right = directionX == 1;
                     }
                 }
             }
@@ -195,9 +213,9 @@ namespace Physics
             {
                 moveAmount.y = climbmoveAmountY;
                 moveAmount.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(moveAmount.x);
-                _collisions.Below = true;
-                _collisions.ClimbingSlope = true;
-                _collisions.SlopeAngle = slopeAngle;
+                Collisions.Below = true;
+                Collisions.ClimbingSlope = true;
+                Collisions.SlopeAngle = slopeAngle;
             }
 
         }
@@ -222,9 +240,9 @@ namespace Physics
                             moveAmount.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(moveAmount.x);
                             moveAmount.y -= descendmoveAmountY;
 
-                            _collisions.SlopeAngle = slopeAngle;
-                            _collisions.DescendingSlope = true;
-                            _collisions.Below = true;
+                            Collisions.SlopeAngle = slopeAngle;
+                            Collisions.DescendingSlope = true;
+                            Collisions.Below = true;
                         }
                     }
                 }
@@ -252,13 +270,13 @@ namespace Physics
                         {
                             continue;
                         }
-                        if (_collisions.FallingThroughPlatform)
+                        if (Collisions.FallingThroughPlatform)
                         {
                             continue;
                         }
-                        if (MoveAcrossPlatform)
+                        if (_playerInput.y == -1)
                         {
-                            _collisions.FallingThroughPlatform = true;
+                            Collisions.FallingThroughPlatform = true;
                             Invoke("ResetFallingThroughPlatform", FallingThroughPlatformResetTimer);
                             continue;
                         }
@@ -266,17 +284,17 @@ namespace Physics
                     moveAmount.y = (hit.distance - SkinWidth) * directionY;
                     rayLength = hit.distance;
 
-                    if (_collisions.ClimbingSlope)
+                    if (Collisions.ClimbingSlope)
                     {
-                        moveAmount.x = moveAmount.y / Mathf.Tan(_collisions.SlopeAngle * Mathf.Deg2Rad) * Mathf.Sign(moveAmount.x);
+                        moveAmount.x = moveAmount.y / Mathf.Tan(Collisions.SlopeAngle * Mathf.Deg2Rad) * Mathf.Sign(moveAmount.x);
                     }
 
-                    _collisions.Below = directionY == -1;
-                    _collisions.Above = directionY == 1;
+                    Collisions.Below = directionY == -1;
+                    Collisions.Above = directionY == 1;
                 }
             }
 
-            if (_collisions.ClimbingSlope)
+            if (Collisions.ClimbingSlope)
             {
                 float directionX = Mathf.Sign(moveAmount.x);
                 rayLength = Mathf.Abs(moveAmount.x) + SkinWidth;
@@ -286,10 +304,10 @@ namespace Physics
                 if (hit)
                 {
                     float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-                    if (slopeAngle != _collisions.SlopeAngle)
+                    if (slopeAngle != Collisions.SlopeAngle)
                     {
                         moveAmount.x = (hit.distance * SkinWidth) * directionX;
-                        _collisions.SlopeAngle = slopeAngle;
+                        Collisions.SlopeAngle = slopeAngle;
                     }
                 }
             }
@@ -297,11 +315,12 @@ namespace Physics
 
         private void ResetFallingThroughPlatform()
         {
-            _collisions.FallingThroughPlatform = false;
+            Collisions.FallingThroughPlatform = false;
         } 
 
         private void CalculateVelocity()
         {
+            Velocity.x = DirectionalInput.x;
             Velocity.y += Gravity * Time.deltaTime;
         }
 
