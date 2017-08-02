@@ -1,37 +1,39 @@
-﻿using Physics;
+﻿using Assets.Scripts;
+using Physics;
 using UnityEngine;
 [RequireComponent(typeof(Controller2D))]
 public class PlayerInput : MonoBehaviour
 {
     private Animator anim;
     private Controller2D controller;
+    private CharacterStats _stats;
     private SpriteRenderer rend;
     private bool flip;
     private bool ShowUseMsg;
 
-    public bool grounded;
     public bool Climbing;
     public bool ClimbingV2;
     public bool ExitLadder;
     public bool EndLadder;
 
-    private void Start()
+    private void Awake()
     {
-        ShowUseMsg = false;
+        _stats = GetComponent<CharacterStats>();
         rend = GetComponent<SpriteRenderer>();
         controller = GetComponent<Controller2D>();
         anim = GetComponent<Animator>();
     }
 
-    private void Update()
-
+    private void Start()
     {
-        grounded = controller.Collisions.Below;
-        var directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        controller.DirectionalInput = directionalInput;
+        ShowUseMsg = false;   
+    }
+
+    private void Update()
+    {
 
         anim.SetFloat("Speed", Mathf.Abs(controller.Velocity.x));
-        anim.SetBool("Grounded", controller.Collisions.Below);
+        anim.SetBool("Grounded", controller.Grounded);
         anim.SetBool("Climbing", Climbing);
         anim.SetBool("ClimbingV2", ClimbingV2);
 
@@ -48,7 +50,7 @@ public class PlayerInput : MonoBehaviour
         }
 
         if (Input.GetButtonDown("Jump"))
-            controller.Jump();
+            controller.Jump(_stats.JumpHeight);
 
         if (!Climbing)
             rend.flipX = flip;
@@ -68,27 +70,20 @@ public class PlayerInput : MonoBehaviour
             }
             controller.Gravity = 0;
             controller.Velocity.x = 0;
-            controller.DirectionalInput = new Vector2(0, Input.GetAxisRaw("Vertical"));
-            if (!EndLadder)
+            if (!EndLadder || Input.GetAxisRaw("Vertical") < 0)
             {
-                controller.Velocity.y = Input.GetAxisRaw("Vertical") * controller.ClimbSpeed;
-            }
-            else
-            {
-                if (Input.GetAxisRaw("Vertical") < 0)
-                {
-                    controller.Velocity.y = Input.GetAxisRaw("Vertical") * controller.ClimbSpeed;
-                }
+                controller.Velocity.y = Input.GetAxisRaw("Vertical") * _stats.MoveSpeed;
             }
             
             
-            anim.speed = Mathf.Abs(controller.Velocity.y /2.2f / controller.ClimbSpeed);
+            anim.speed = Mathf.Abs(controller.Velocity.y /2.2f / _stats.MoveSpeed);
         }
         else
         {
-            controller.Gravity = -(2 * controller.MaxJumpHeight) / Mathf.Pow(0.4f, 2);
+            controller.Gravity = -25;
             anim.speed = 1;
-            controller.DirectionalInput = directionalInput;
+            controller.MoveAcrossPlatform = Input.GetAxisRaw("Vertical") == -1;
+            controller.Velocity.x = Input.GetAxisRaw("Horizontal") * _stats.MoveSpeed;
         }
 
 

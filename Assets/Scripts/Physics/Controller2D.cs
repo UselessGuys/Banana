@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿// Velocity, Gravity, MoveAcrossPlatform
+// Method "Jump"
+using UnityEngine;
 
 namespace Physics
 {
@@ -38,42 +40,40 @@ namespace Physics
         private const float DstBetweenRays = .25f;
         private const float MaxClimbAngle = 80f;
         private const float MaxDescendAngle = 80f;
-        private const float TimeToJumpApex = 0.4f;
         private const float FallingThroughPlatformResetTimer = 0.1f;
 
         private int _horizontalRayCount;
         private int _verticalRayCount;
         private float _horizontalRaySpacing;
         private float _verticalRaySpacing;            
-        private bool _isDoubleJumping;
-        private float _maxJumpVelocity;      
+        private bool _isDoubleJumping;      
         private BoxCollider2D _collider;      
         private Vector2 _playerInput;
+        private CollisionInfo _collisions;
+       
 
-
-
-        public LayerMask CollisionMask;        
-        public float MaxJumpHeight = 4f;
-        public float ClimbSpeed = 3f;
+        public LayerMask CollisionMask; //ToDo Константой
         public bool CanDoubleJump;
 
-        [HideInInspector] public float Gravity;
         [HideInInspector] public Vector2 Velocity;
-        [HideInInspector] public RaycastOrigins RaycastOrigin;       
-        [HideInInspector] public CollisionInfo Collisions;         
-        [HideInInspector] public float ObjectHeight;
-        [HideInInspector] public Vector2 DirectionalInput { set; get; }
+        [HideInInspector] public float Gravity = -25;
+        [HideInInspector] public bool MoveAcrossPlatform { get; set; }
 
-        public void Jump()
+        [HideInInspector] public float ObjectHeight { get; private set; } //ToDo проект в 6 Шарп
+        [HideInInspector] public bool Grounded;
+        [HideInInspector] public RaycastOrigins RaycastOrigin;
+        
+
+        public void Jump(float jumpHeight)
         {
-            if (Collisions.Below)
+            if (_collisions.Below)
             {
-                Velocity.y = _maxJumpVelocity;
+                Velocity.y = jumpHeight;
                 _isDoubleJumping = false;
             }
-            if (CanDoubleJump && !Collisions.Below && !_isDoubleJumping)
+            if (CanDoubleJump && !_collisions.Below && !_isDoubleJumping)
             {
-                Velocity.y = _maxJumpVelocity;
+                Velocity.y = jumpHeight;
                 _isDoubleJumping = true;
             }
         }
@@ -83,15 +83,14 @@ namespace Physics
             _collider = GetComponent<BoxCollider2D>();
 
             ObjectHeight = transform.localScale.y * _collider.size.y;
+            Grounded = _collisions.Below;
         }
 
         private void Start()
         {
             CalculateRaySpacing();
-            Collisions.FaceDirection = 1;
-
-            Gravity = -(2 * MaxJumpHeight) / Mathf.Pow(TimeToJumpApex, 2);
-            _maxJumpVelocity = Mathf.Abs(Gravity) * TimeToJumpApex;      
+            _collisions.FaceDirection = 1;
+     
         }
 
         
@@ -100,22 +99,21 @@ namespace Physics
         {
             CalculateVelocity();
 
-            Move(Velocity * Time.deltaTime, DirectionalInput);
+            Move(Velocity * Time.deltaTime);
 
-            if (Collisions.Above || Collisions.Below)
+            if (_collisions.Above || _collisions.Below)
                 Velocity.y = 0f;
         }
 
-        private void Move(Vector2 moveAmount, Vector2 input = default(Vector2), bool standingOnPlatform = false)
+        private void Move(Vector2 moveAmount)
         {
             UpdateRaycastOrigins();
-            Collisions.Reset();
-            Collisions.MoveAmountOld = moveAmount;
-            _playerInput = input;
+            _collisions.Reset();
+            _collisions.MoveAmountOld = moveAmount;
 
             if (moveAmount.x != 0)
             {
-                Collisions.FaceDirection = (int)Mathf.Sign(moveAmount.x);
+                _collisions.FaceDirection = (int)Mathf.Sign(moveAmount.x);
             }
 
             if (moveAmount.y < 0)
@@ -131,16 +129,11 @@ namespace Physics
             }
 
             transform.Translate(moveAmount);
-
-            if (standingOnPlatform)
-            {
-                Collisions.Below = true;
-            }
         }
 
         private void HorizontalCollisions(ref Vector2 moveAmount)
         {
-            float directionX = Collisions.FaceDirection;
+            float directionX = _collisions.FaceDirection;
             float rayLength = Mathf.Abs(moveAmount.x) + SkinWidth;
 
             if (Mathf.Abs(moveAmount.x) < SkinWidth)
@@ -163,13 +156,13 @@ namespace Physics
 
                     if (i == 0 && slopeAngle <= MaxClimbAngle)
                     {
-                        if (Collisions.DescendingSlope)
+                        if (_collisions.DescendingSlope)
                         {
-                            Collisions.DescendingSlope = false;
-                            moveAmount = Collisions.MoveAmountOld;
+                            _collisions.DescendingSlope = false;
+                            moveAmount = _collisions.MoveAmountOld;
                         }
                         float distanceToSlopeStart = 0f;
-                        if (slopeAngle != Collisions.SlopeAngleOld)
+                        if (slopeAngle != _collisions.SlopeAngleOld)
                         {
                             distanceToSlopeStart = hit.distance - SkinWidth;
                             moveAmount.x -= distanceToSlopeStart * directionX;
@@ -178,18 +171,18 @@ namespace Physics
                         moveAmount.x += distanceToSlopeStart * directionX;
                     }
 
-                    if (!Collisions.ClimbingSlope || slopeAngle > MaxClimbAngle)
+                    if (!_collisions.ClimbingSlope || slopeAngle > MaxClimbAngle)
                     {
                         moveAmount.x = (hit.distance - SkinWidth) * directionX;
                         rayLength = hit.distance;
 
-                        if (Collisions.ClimbingSlope)
+                        if (_collisions.ClimbingSlope)
                         {
-                            moveAmount.y = Mathf.Tan(Collisions.SlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(moveAmount.x);
+                            moveAmount.y = Mathf.Tan(_collisions.SlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(moveAmount.x);
                         }
 
-                        Collisions.Left = directionX == -1;
-                        Collisions.Right = directionX == 1;
+                        _collisions.Left = directionX == -1;
+                        _collisions.Right = directionX == 1;
                     }
                 }
             }
@@ -204,9 +197,9 @@ namespace Physics
             {
                 moveAmount.y = climbmoveAmountY;
                 moveAmount.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(moveAmount.x);
-                Collisions.Below = true;
-                Collisions.ClimbingSlope = true;
-                Collisions.SlopeAngle = slopeAngle;
+                _collisions.Below = true;
+                _collisions.ClimbingSlope = true;
+                _collisions.SlopeAngle = slopeAngle;
             }
 
         }
@@ -231,9 +224,9 @@ namespace Physics
                             moveAmount.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(moveAmount.x);
                             moveAmount.y -= descendmoveAmountY;
 
-                            Collisions.SlopeAngle = slopeAngle;
-                            Collisions.DescendingSlope = true;
-                            Collisions.Below = true;
+                            _collisions.SlopeAngle = slopeAngle;
+                            _collisions.DescendingSlope = true;
+                            _collisions.Below = true;
                         }
                     }
                 }
@@ -261,13 +254,13 @@ namespace Physics
                         {
                             continue;
                         }
-                        if (Collisions.FallingThroughPlatform)
+                        if (_collisions.FallingThroughPlatform)
                         {
                             continue;
                         }
-                        if (_playerInput.y == -1)
+                        if (MoveAcrossPlatform)
                         {
-                            Collisions.FallingThroughPlatform = true;
+                            _collisions.FallingThroughPlatform = true;
                             Invoke("ResetFallingThroughPlatform", FallingThroughPlatformResetTimer);
                             continue;
                         }
@@ -275,17 +268,17 @@ namespace Physics
                     moveAmount.y = (hit.distance - SkinWidth) * directionY;
                     rayLength = hit.distance;
 
-                    if (Collisions.ClimbingSlope)
+                    if (_collisions.ClimbingSlope)
                     {
-                        moveAmount.x = moveAmount.y / Mathf.Tan(Collisions.SlopeAngle * Mathf.Deg2Rad) * Mathf.Sign(moveAmount.x);
+                        moveAmount.x = moveAmount.y / Mathf.Tan(_collisions.SlopeAngle * Mathf.Deg2Rad) * Mathf.Sign(moveAmount.x);
                     }
 
-                    Collisions.Below = directionY == -1;
-                    Collisions.Above = directionY == 1;
+                    _collisions.Below = directionY == -1;
+                    _collisions.Above = directionY == 1;
                 }
             }
 
-            if (Collisions.ClimbingSlope)
+            if (_collisions.ClimbingSlope)
             {
                 float directionX = Mathf.Sign(moveAmount.x);
                 rayLength = Mathf.Abs(moveAmount.x) + SkinWidth;
@@ -295,10 +288,10 @@ namespace Physics
                 if (hit)
                 {
                     float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-                    if (slopeAngle != Collisions.SlopeAngle)
+                    if (slopeAngle != _collisions.SlopeAngle)
                     {
                         moveAmount.x = (hit.distance * SkinWidth) * directionX;
-                        Collisions.SlopeAngle = slopeAngle;
+                        _collisions.SlopeAngle = slopeAngle;
                     }
                 }
             }
@@ -306,12 +299,11 @@ namespace Physics
 
         private void ResetFallingThroughPlatform()
         {
-            Collisions.FallingThroughPlatform = false;
+            _collisions.FallingThroughPlatform = false;
         } 
 
         private void CalculateVelocity()
         {
-            Velocity.x = DirectionalInput.x;
             Velocity.y += Gravity * Time.deltaTime;
         }
 
