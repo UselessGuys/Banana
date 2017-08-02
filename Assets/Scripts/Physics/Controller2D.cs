@@ -47,8 +47,7 @@ namespace Physics
         private float _horizontalRaySpacing;
         private float _verticalRaySpacing;            
         private bool _isDoubleJumping;      
-        private BoxCollider2D _collider;      
-        private Vector2 _playerInput;
+        private BoxCollider2D _collider;
         private CollisionInfo _collisions;
        
 
@@ -59,7 +58,7 @@ namespace Physics
         [HideInInspector] public float Gravity = -25;
         [HideInInspector] public bool MoveAcrossPlatform { get; set; }
 
-        [HideInInspector] public float ObjectHeight { get; private set; } //ToDo проект в 6 Шарп
+        [HideInInspector] public float ObjectHeight => transform.localScale.y * _collider.size.y; 
         [HideInInspector] public bool Grounded;
         [HideInInspector] public RaycastOrigins RaycastOrigin;
         
@@ -82,7 +81,6 @@ namespace Physics
         {
             _collider = GetComponent<BoxCollider2D>();
 
-            ObjectHeight = transform.localScale.y * _collider.size.y;
             Grounded = _collisions.Below;
         }
 
