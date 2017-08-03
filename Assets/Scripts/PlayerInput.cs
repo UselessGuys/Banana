@@ -1,57 +1,59 @@
-﻿using Physics;
+﻿using Assets.Scripts;
+using Physics;
 using UnityEngine;
+
 [RequireComponent(typeof(Controller2D))]
 public class PlayerInput : MonoBehaviour
 {
-    private Animator anim;
-    private Controller2D controller;
-    private SpriteRenderer rend;
-    private bool flip;
-    private bool ShowUseMsg;
+    private Animator _animator;
+    private Controller2D _controller;
+    private CharacterStats _stats;
+    private SpriteRenderer _renderer;
+    private bool _flip;
+    private bool _showUseMsg;
 
-    public bool grounded;
     public bool Climbing;
     public bool ClimbingV2;
     public bool ExitLadder;
     public bool EndLadder;
 
+    private void Awake()
+    {
+        _stats = GetComponent<CharacterStats>();
+        _renderer = GetComponent<SpriteRenderer>();
+        _controller = GetComponent<Controller2D>();
+        _animator = GetComponent<Animator>();
+    }
+
     private void Start()
     {
-        ShowUseMsg = false;
-        rend = GetComponent<SpriteRenderer>();
-        controller = GetComponent<Controller2D>();
-        anim = GetComponent<Animator>();
+        _showUseMsg = false;
     }
 
     private void Update()
-
     {
-        grounded = controller.Collisions.Below;
-        var directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        controller.DirectionalInput = directionalInput;
+        _animator.SetFloat("Speed", Mathf.Abs(_controller.Velocity.x));
+        _animator.SetBool("Grounded", _controller.Grounded);
+        _animator.SetBool("Climbing", Climbing);
+        _animator.SetBool("ClimbingV2", ClimbingV2);
 
-        anim.SetFloat("Speed", Mathf.Abs(controller.Velocity.x));
-        anim.SetBool("Grounded", controller.Collisions.Below);
-        anim.SetBool("Climbing", Climbing);
-        anim.SetBool("ClimbingV2", ClimbingV2);
 
-        
 
         if (Input.GetAxisRaw("Horizontal") < 0)
         {
-            flip = true;
+            _flip = true;
         }
 
         else if (Input.GetAxisRaw("Horizontal") > 0)
         {
-            flip = false;
+            _flip = false;
         }
 
         if (Input.GetButtonDown("Jump"))
-            controller.Jump();
+            _controller.Jump(_stats.JumpHeight);
 
         if (!Climbing)
-            rend.flipX = flip;
+            _renderer.flipX = _flip;
 
 
         if ((Input.GetButtonUp("Use")))
@@ -59,36 +61,29 @@ public class PlayerInput : MonoBehaviour
             Debug.Log("Use");
         }
 
-        if ((Climbing || ClimbingV2)) 
+        if ((Climbing || ClimbingV2))
         {
             if ((Input.GetButtonDown("Jump") || Input.GetAxisRaw("Horizontal") != 0) && ExitLadder)
             {
                 Climbing = false;
                 ClimbingV2 = false;
             }
-            controller.Gravity = 0;
-            controller.Velocity.x = 0;
-            controller.DirectionalInput = new Vector2(0, Input.GetAxisRaw("Vertical"));
-            if (!EndLadder)
+            _controller.Gravity = 0;
+            _controller.Velocity.x = 0;
+            if (!EndLadder || Input.GetAxisRaw("Vertical") < 0)
             {
-                controller.Velocity.y = Input.GetAxisRaw("Vertical") * controller.ClimbSpeed;
+                _controller.Velocity.y = Input.GetAxisRaw("Vertical") * _stats.MoveSpeed;
             }
-            else
-            {
-                if (Input.GetAxisRaw("Vertical") < 0)
-                {
-                    controller.Velocity.y = Input.GetAxisRaw("Vertical") * controller.ClimbSpeed;
-                }
-            }
-            
-            
-            anim.speed = Mathf.Abs(controller.Velocity.y /2.2f / controller.ClimbSpeed);
+
+
+            _animator.speed = Mathf.Abs(_controller.Velocity.y / 2.2f / _stats.MoveSpeed);
         }
         else
         {
-            controller.Gravity = -(2 * controller.MaxJumpHeight) / Mathf.Pow(0.4f, 2);
-            anim.speed = 1;
-            controller.DirectionalInput = directionalInput;
+            _controller.Gravity = -25;
+            _animator.speed = 1;
+            _controller.MoveAcrossPlatform = Input.GetAxisRaw("Vertical") == -1;
+            _controller.Velocity.x = Input.GetAxisRaw("Horizontal") * _stats.MoveSpeed;
         }
 
 
@@ -101,12 +96,12 @@ public class PlayerInput : MonoBehaviour
         Debug.Log("Enter " + collision.gameObject.tag);
         if (collision.gameObject.CompareTag("Ladder"))
         {
-            ShowUseMsg = true;
+            _showUseMsg = true;
         }
 
         if (collision.gameObject.CompareTag("LadderV2"))
         {
-            ShowUseMsg = true;
+            _showUseMsg = true;
         }
 
         if (collision.gameObject.CompareTag("ExitLadder"))
@@ -114,10 +109,10 @@ public class PlayerInput : MonoBehaviour
             ExitLadder = true;
         }
 
-        if (collision.gameObject.CompareTag("EndLadder")  && (Climbing || ClimbingV2))
+        if (collision.gameObject.CompareTag("EndLadder") && (Climbing || ClimbingV2))
         {
             EndLadder = true;
-            controller.Velocity.y = 0;
+            _controller.Velocity.y = 0;
         }
 
 
@@ -127,7 +122,7 @@ public class PlayerInput : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ladder"))
         {
-            if((Input.GetButtonUp("Use")))
+            if ((Input.GetButtonUp("Use")))
             {
                 Climbing = true;
                 Debug.Log("Use");
@@ -151,15 +146,15 @@ public class PlayerInput : MonoBehaviour
         Debug.Log("Exit " + collision.gameObject.tag);
         if (collision.gameObject.CompareTag("Ladder"))
         {
-            
+
             Climbing = false;
-            ShowUseMsg = false;
+            _showUseMsg = false;
         }
 
         if (collision.gameObject.CompareTag("LadderV2"))
         {
             ClimbingV2 = false;
-            ShowUseMsg = false;
+            _showUseMsg = false;
         }
 
         if (collision.gameObject.CompareTag("ExitLadder"))
@@ -170,14 +165,14 @@ public class PlayerInput : MonoBehaviour
         if (collision.gameObject.CompareTag("EndLadder"))
         {
             EndLadder = false;
-            
+
         }
-        
+
     }
 
     private void OnGUI()
     {
-        if (ShowUseMsg)
+        if (_showUseMsg)
             GUI.Label(new Rect(0, 0, 100, 100), "Нажмите E чтобы взаимодействовать");
     }
 }
