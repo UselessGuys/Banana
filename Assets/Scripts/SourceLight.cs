@@ -21,14 +21,14 @@ public class SourceLight : MonoBehaviour
 
     private static Vector3 PointOnCircle(float radius, float angleInDegrees, Vector2 center)
     {
-        float x = (float)(radius * Mathf.Cos(angleInDegrees * Mathf.Deg2Rad)) + center.x;
-        float y = (float)(radius * Mathf.Sin(angleInDegrees * Mathf.Deg2Rad)) + center.y;
+        var x = (float)(radius * Mathf.Cos(angleInDegrees * Mathf.Deg2Rad)) + center.x;
+        var y = (float)(radius * Mathf.Sin(angleInDegrees * Mathf.Deg2Rad)) + center.y;
 
         return new Vector3(x, y);
     }
 
 
-    void Start()
+    private void Start()
     {
         _vertices = new Vector3[360/Inc];
 
@@ -47,40 +47,35 @@ public class SourceLight : MonoBehaviour
 
     private void GenMesh()
     {
-        for (int i = 0; i < 360 / Inc; i++)
+        for (var i = 0; i < 360 / Inc; i++)
         {
-            RaycastHit2D hit = Physics2D.Raycast(this.transform.position, PointOnCircle(Range, i * Inc, this.transform.position) - this.transform.position, Range, LayerMask);
+            var hit = Physics2D.Raycast(transform.position, PointOnCircle(Range, i * Inc, transform.position) - transform.position, Range, LayerMask);
 
             float R = 0;
             if (hit.collider != null && hit.distance <= Range)
-            {
                 R = hit.distance;
-            }
             else
-            {
                 R = Range;
-            }
 
-            _vertices[i] = (PointOnCircle(R, i * Inc, this.transform.position) - this.transform.position);
+            _vertices[i] = PointOnCircle(R, i * Inc, transform.position) - transform.position;
         }
 
-        Triangulator tr = new Triangulator(_vertices);
-        int[] indices = tr.Triangulate();
+        var tr = new Triangulator(_vertices);
+        var indices = tr.Triangulate();
 
 
         _mesh.vertices = _vertices;
-        Vector2[] uv = new Vector2[_vertices.Length];
-        for (int i = 0; i < _vertices.Length; i++)
-        {
-            uv[i] = new Vector2((_vertices[i].x / Range / 2) + 0.5f, (_vertices[i].y / Range / 2) + 0.5f);
-        }
+        var uv = new Vector2[_vertices.Length];
+        for (var i = 0; i < _vertices.Length; i++)
+            uv[i] = new Vector2(_vertices[i].x / Range / 2 + 0.5f, _vertices[i].y / Range / 2 + 0.5f);
         _mesh.uv = uv;
         _mesh.triangles = indices;
         _mesh.RecalculateNormals();
         _mesh.RecalculateBounds();
         _filter.mesh = _mesh;
     }
-    void Update()
+
+    private void Update()
     {
 
         _light.color = Color;
@@ -89,7 +84,7 @@ public class SourceLight : MonoBehaviour
  
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         GenMesh();
     }
