@@ -3,19 +3,17 @@ using UnityEditor;
 using UnityEngine;
 
 [RequireComponent(typeof(DynamicObject))]
-public class PlayerInput : MonoBehaviour
+public class PlayerControl : MonoBehaviour
 {
     private Animator _animator;
     private DynamicObject _controller;
     private CharacterStats _stats;
     private SpriteRenderer _renderer;
-    private bool _flip;
     private bool _showUseMsg;
-
-    public bool Climbing;
-    public bool ClimbingV2;
-    public bool ExitLadder;
-    public bool EndLadder;
+    private bool _climbing;
+    private bool _climbingV2;
+    private bool _exitLadder;
+    private bool _endLadder;
 
     private void Awake()
     {
@@ -34,21 +32,21 @@ public class PlayerInput : MonoBehaviour
     {
         _animator.SetFloat("Speed", Mathf.Abs(_controller.Velocity.x));
         _animator.SetBool("Grounded", _controller.Grounded);
-        _animator.SetBool("Climbing", Climbing);
-        _animator.SetBool("ClimbingV2", ClimbingV2);
+        _animator.SetBool("Climbing", _climbing);
+        _animator.SetBool("ClimbingV2", _climbingV2);
 
-        if (Input.GetAxisRaw("Horizontal") < 0)
+
+        if (!_climbing)
         {
-            _flip = true;
+            if (Input.GetAxisRaw("Horizontal") < 0)
+            {
+                _renderer.flipX = true;
+            }
+            else if (Input.GetAxisRaw("Horizontal") > 0)
+            {
+                _renderer.flipX = false;
+            }
         }
-
-        else if (Input.GetAxisRaw("Horizontal") > 0)
-        {
-            _flip = false;
-        }
-
-        if (!Climbing)
-            _renderer.flipX = _flip;
         
 
         if (Input.GetButtonDown("Jump"))
@@ -59,16 +57,16 @@ public class PlayerInput : MonoBehaviour
             Debug.Log("Use");
         }
 
-        if ((Climbing || ClimbingV2))
+        if ((_climbing || _climbingV2))
         {
-            if ((Input.GetButtonDown("Jump") || Input.GetAxisRaw("Horizontal") != 0) && ExitLadder)
+            if ((Input.GetButtonDown("Jump") || Input.GetAxisRaw("Horizontal") != 0) && _exitLadder)
             {
-                Climbing = false;
-                ClimbingV2 = false;
+                _climbing = false;
+                _climbingV2 = false;
             }
             _controller.Gravity = 0;
             _controller.Velocity.x = 0;
-            if (!EndLadder || Input.GetAxisRaw("Vertical") < 0)
+            if (!_endLadder || Input.GetAxisRaw("Vertical") < 0)
             {
                 _controller.Velocity.y = Input.GetAxisRaw("Vertical") * _stats.MoveSpeed;
             }
@@ -102,12 +100,12 @@ public class PlayerInput : MonoBehaviour
 
         if (collision.gameObject.CompareTag("ExitLadder"))
         {
-            ExitLadder = true;
+            _exitLadder = true;
         }
 
-        if (collision.gameObject.CompareTag("EndLadder") && (Climbing || ClimbingV2))
+        if (collision.gameObject.CompareTag("EndLadder") && (_climbing || _climbingV2))
         {
-            EndLadder = true;
+            _endLadder = true;
             _controller.Velocity.y = 0;
         }
 
@@ -120,7 +118,7 @@ public class PlayerInput : MonoBehaviour
         {
             if ((Input.GetButtonUp("Use")))
             {
-                Climbing = true;
+                _climbing = true;
                 Debug.Log("Use");
             }
         }
@@ -131,7 +129,7 @@ public class PlayerInput : MonoBehaviour
         {
             if ((Input.GetButtonUp("Use")))
             {
-                ClimbingV2 = true;
+                _climbingV2 = true;
                 this.transform.position = new Vector3(collision.gameObject.transform.position.x, this.transform.position.y, this.transform.position.z);
             }
         }
@@ -143,24 +141,24 @@ public class PlayerInput : MonoBehaviour
         if (collision.gameObject.CompareTag("Ladder"))
         {
 
-            Climbing = false;
+            _climbing = false;
             _showUseMsg = false;
         }
 
         if (collision.gameObject.CompareTag("LadderV2"))
         {
-            ClimbingV2 = false;
+            _climbingV2 = false;
             _showUseMsg = false;
         }
 
         if (collision.gameObject.CompareTag("ExitLadder"))
         {
-            ExitLadder = false;
+            _exitLadder = false;
         }
 
         if (collision.gameObject.CompareTag("EndLadder"))
         {
-            EndLadder = false;
+            _endLadder = false;
 
         }
 
