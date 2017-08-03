@@ -59,7 +59,7 @@ public class DynamicObject : MonoBehaviour
     [HideInInspector] public bool MoveAcrossPlatform { get; set; }
 
     [HideInInspector] public float ObjectHeight { get; private set; } //ToDo проект в 6 Шарп, кттс
-    [HideInInspector] public bool Grounded { get; private set; }
+    [HideInInspector] public bool Grounded;
     [HideInInspector] public RaycastOrigins RaycastOrigin;
 
 
@@ -81,8 +81,7 @@ public class DynamicObject : MonoBehaviour
     {
         _collider = GetComponent<BoxCollider2D>();
 
-        ObjectHeight = transform.localScale.y * _collider.size.y;
-        Grounded = _collisions.Below;
+        ObjectHeight = transform.localScale.y * _collider.size.y;       
     }
 
     private void Start()
@@ -97,6 +96,7 @@ public class DynamicObject : MonoBehaviour
     private void Update()
     {
         CalculateVelocity();
+        Grounded = _collisions.Below;
 
         Move(Velocity * Time.deltaTime);
 
