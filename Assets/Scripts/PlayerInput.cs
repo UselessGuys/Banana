@@ -1,12 +1,12 @@
 ﻿using Assets.Scripts;
-using Physics;
+using UnityEditor;
 using UnityEngine;
 
-[RequireComponent(typeof(Controller2D))]
+[RequireComponent(typeof(DynamicObject))]
 public class PlayerInput : MonoBehaviour
 {
     private Animator _animator;
-    private Controller2D _controller;
+    private DynamicObject _controller;
     private CharacterStats _stats;
     private SpriteRenderer _renderer;
     private bool _flip;
@@ -21,7 +21,7 @@ public class PlayerInput : MonoBehaviour
     {
         _stats = GetComponent<CharacterStats>();
         _renderer = GetComponent<SpriteRenderer>();
-        _controller = GetComponent<Controller2D>();
+        _controller = GetComponent<DynamicObject>();
         _animator = GetComponent<Animator>();
     }
 
@@ -37,8 +37,6 @@ public class PlayerInput : MonoBehaviour
         _animator.SetBool("Climbing", Climbing);
         _animator.SetBool("ClimbingV2", ClimbingV2);
 
-
-
         if (Input.GetAxisRaw("Horizontal") < 0)
         {
             _flip = true;
@@ -49,12 +47,12 @@ public class PlayerInput : MonoBehaviour
             _flip = false;
         }
 
-        if (Input.GetButtonDown("Jump"))
-            _controller.Jump(_stats.JumpHeight);
-
         if (!Climbing)
             _renderer.flipX = _flip;
+        
 
+        if (Input.GetButtonDown("Jump"))
+            _controller.Jump(_stats.JumpHeight); 
 
         if ((Input.GetButtonUp("Use")))
         {
@@ -85,8 +83,6 @@ public class PlayerInput : MonoBehaviour
             _controller.MoveAcrossPlatform = Input.GetAxisRaw("Vertical") == -1;
             _controller.Velocity.x = Input.GetAxisRaw("Horizontal") * _stats.MoveSpeed;
         }
-
-
 
     }
 

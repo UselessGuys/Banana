@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Xml.Schema;
 using Assets.Scripts;
-using Physics;
 using UnityEngine;
 
 enum EnemyStates
@@ -26,7 +25,7 @@ internal class Enemy : MonoBehaviour
     public EnemyStates State;
 
     private CharacterStats _stats;
-    private Controller2D _controller;
+    private DynamicObject _controller;
     private SpriteRenderer _renderer;
 
     private bool _rightDirection;
@@ -42,7 +41,7 @@ internal class Enemy : MonoBehaviour
     {
         _renderer = GetComponent<SpriteRenderer>();
         _stats = GetComponent<CharacterStats>();
-        _controller = GetComponent<Controller2D>();
+        _controller = GetComponent<DynamicObject>();
     }
 
     void Start()
