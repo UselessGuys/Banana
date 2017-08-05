@@ -16,12 +16,14 @@ enum EnemyStates
 
 internal class Enemy : MonoBehaviour
 {
+    private static System.Random Random = new System.Random();
+
     private const float HorizontalRaySpacing = 0.2f;
     private const float RayLength = 1f;
+   
 
     public int LeftBorder;
     public int RightBorder;
-
     public EnemyStates State;
 
     private CharacterStats _stats;
@@ -46,9 +48,8 @@ internal class Enemy : MonoBehaviour
 
     void Start()
     {
-        var random = new System.Random();
-        _rightDirection = random.Next(1) == 1;
-        //ToDo Все мобы пойдут в одну сторону может быть.
+        
+        _rightDirection = Random.Next(0, 1) == 1;
 
         _currentAngle = 0;
         _currentSpeed = _stats.MoveSpeed;
@@ -89,7 +90,7 @@ internal class Enemy : MonoBehaviour
 
     private void Scan()
     {
-        _currentAngle += 5; //ToDo Сделать независимым от фпс
+        _currentAngle += 360 * Time.deltaTime;
 
         if (_currentAngle > _stats.VisionAngle / 2)
             _currentAngle -= _stats.VisionAngle;
@@ -115,12 +116,17 @@ internal class Enemy : MonoBehaviour
         var players = GameObject.FindGameObjectsWithTag("Player");
         foreach (var player in players)
         {
-            if (Math.Abs(player.transform.position.x - this.transform.position.x) <
-                _stats.HearRange * player.GetComponent<CharacterStats>().Noise) //ToDo растояние не из центра персонажа
+            if (Math.Abs(player.transform.position.x - this.transform.position.x) 
+                - player.GetComponent<DynamicObject>().ObjectWeght / 2 
+                - this._controller.ObjectWeght / 2 <
+                _stats.HearRange * player.GetComponent<CharacterStats>().Noise) 
             {
                 State = EnemyStates.Attack;
                 _target = player;
             }
+            Debug.Log(Math.Abs(player.transform.position.x - this.transform.position.x)
+                - player.GetComponent<DynamicObject>().ObjectWeght / 2
+                - this._controller.ObjectWeght / 2);
         }
     }
 
@@ -151,7 +157,7 @@ internal class Enemy : MonoBehaviour
 
             Debug.DrawRay(rayOrigin, Vector2.right * (_rightDirection ? 1 : -1), Color.blue);
 
-            if (hit.collider != null && hit.collider.CompareTag("Ground")      //ToDO Платформы тоже блочат с боку
+            if (hit.collider != null && hit.collider.CompareTag("Ground")
                 && hit.collider.gameObject.transform.lossyScale.y > DynamicObject.MaxHorisontalLadder)            
             {
                 _controller.Jump(_stats.JumpHeight);

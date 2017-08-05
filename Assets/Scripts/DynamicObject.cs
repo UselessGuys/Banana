@@ -1,5 +1,6 @@
 ﻿// Velocity, Gravity, MoveAcrossPlatform
 // Method "Jump"
+// ToDo проект в 6 Шарп, кттс
 
 using System;
 using UnityEngine;
@@ -58,7 +59,8 @@ public class DynamicObject : MonoBehaviour
     [HideInInspector] public float Gravity;
     [HideInInspector] public bool MoveAcrossPlatform { get; set; }
 
-    [HideInInspector] public float ObjectHeight { get; private set; } //ToDo проект в 6 Шарп, кттс
+    [HideInInspector] public float ObjectHeight { get; private set; }
+    [HideInInspector] public float ObjectWeght { get; private set; }
     [HideInInspector] public bool Grounded;
     [HideInInspector] public RaycastOrigins RaycastOrigin;
 
@@ -81,7 +83,8 @@ public class DynamicObject : MonoBehaviour
     {
         _collider = GetComponent<BoxCollider2D>();
 
-        ObjectHeight = transform.localScale.y * _collider.size.y;       
+        ObjectHeight = transform.localScale.y * _collider.size.y;
+        ObjectWeght = transform.localScale.x * _collider.size.x;
     }
 
     private void Start()
