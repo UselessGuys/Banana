@@ -16,7 +16,7 @@ enum EnemyStates
 
 internal class Enemy : MonoBehaviour
 {
-    private const float HorizontalRaySpacing = 0.5f;
+    private const float HorizontalRaySpacing = 0.2f;
     private const float RayLength = 1f;
 
     public int LeftBorder;
@@ -126,7 +126,7 @@ internal class Enemy : MonoBehaviour
 
     private void Move(float speed)
     {
-        if (Math.Abs(speed) > 0)
+        if (Math.Abs(speed) > 0) //ToDo не должен прыгать при достижении игрока
             CheckObstacles();
 
         if (_rightDirection)
@@ -151,7 +151,7 @@ internal class Enemy : MonoBehaviour
 
             Debug.DrawRay(rayOrigin, Vector2.right * (_rightDirection ? 1 : -1), Color.blue);
 
-            if (hit.collider != null && hit.collider.CompareTag("Ground"))
+            if (hit.collider != null && hit.collider.CompareTag("Ground")) //ToDO Платформы тоже блочат с боку
             {
                 _controller.Jump(_stats.JumpHeight);
             }

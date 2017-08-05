@@ -35,10 +35,10 @@ public class DynamicObject : MonoBehaviour
             SlopeAngle = 0f;
         }
     }
-
+    private const float MaxHorisontalLadder = .4f;
     private const float SkinWidth = .015f;
-    private const float DstBetweenRays = .25f;
-    private const float MaxClimbAngle = 80f;
+    private const float DstBetweenRays = .20f;
+    private const float MaxClimbAngle = 60f;
     private const float MaxDescendAngle = 80f;
     private const float FallingThroughPlatformResetTimer = 0.1f;
 
@@ -140,6 +140,7 @@ public class DynamicObject : MonoBehaviour
             rayLength = 2 * SkinWidth;
         }
 
+
         for (int i = 0; i < _horizontalRayCount; i++)
         {
             Vector2 rayOrigin = (directionX == -1) ? RaycastOrigin.BottomLeft : RaycastOrigin.BottomRight;
@@ -150,6 +151,11 @@ public class DynamicObject : MonoBehaviour
 
             if (hit && hit.distance > 0)
             {
+                if (hit.distance < SkinWidth * 2)
+                    if (hit.collider.gameObject.transform.lossyScale.y < MaxHorisontalLadder && i == 0 && Grounded)
+                           transform.Translate(directionX * SkinWidth, hit.collider.gameObject.transform.lossyScale.y, 0);
+
+
 
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 
