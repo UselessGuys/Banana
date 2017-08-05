@@ -10,7 +10,7 @@ namespace Tools
         public override void OnGUI(Rect position, SerializedProperty prop, GUIContent label)
         {
             var atr = (TooltipAttribute)attribute;
-            var content = new GUIContent(label.text, atr.text);
+            var content = new GUIContent(label.text, atr.Text);
             EditorGUI.PropertyField(position, prop, content);
         }
     }

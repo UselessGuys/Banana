@@ -4,11 +4,11 @@ namespace Tools
 {
     public class TooltipAttribute : PropertyAttribute
     {
-        public readonly string text;
+        public readonly string Text;
 
         public TooltipAttribute(string text)
         {
-            this.text = text;
+            this.Text = text;
         }
     }
 }
