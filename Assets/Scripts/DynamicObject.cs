@@ -52,6 +52,7 @@ public class DynamicObject : MonoBehaviour
 
     public const float MaxHorisontalLadder = .4f;
 
+    [Tools.Tooltip("Слой земли")]
     public LayerMask CollisionMask; 
     public bool CanDoubleJump;
 
