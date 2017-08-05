@@ -151,10 +151,12 @@ internal class Enemy : MonoBehaviour
 
             Debug.DrawRay(rayOrigin, Vector2.right * (_rightDirection ? 1 : -1), Color.blue);
 
-            if (hit.collider != null && hit.collider.CompareTag("Ground")) //ToDO Платформы тоже блочат с боку
+            if (hit.collider != null && hit.collider.CompareTag("Ground")      //ToDO Платформы тоже блочат с боку
+                && hit.collider.gameObject.transform.lossyScale.y > DynamicObject.MaxHorisontalLadder)            
             {
                 _controller.Jump(_stats.JumpHeight);
             }
+
         }
     }
 }

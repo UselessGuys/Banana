@@ -35,7 +35,6 @@ public class DynamicObject : MonoBehaviour
             SlopeAngle = 0f;
         }
     }
-    private const float MaxHorisontalLadder = .4f;
     private const float SkinWidth = .015f;
     private const float DstBetweenRays = .20f;
     private const float MaxClimbAngle = 60f;
@@ -50,6 +49,7 @@ public class DynamicObject : MonoBehaviour
     private BoxCollider2D _collider;
     private CollisionInfo _collisions;
 
+    public const float MaxHorisontalLadder = .4f;
 
     public LayerMask CollisionMask; 
     public bool CanDoubleJump;
