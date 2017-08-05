@@ -1,5 +1,4 @@
 ﻿using Assets.Scripts;
-using UnityEditor;
 using UnityEngine;
 
 [RequireComponent(typeof(DynamicObject))]
@@ -52,10 +51,6 @@ public class PlayerControl : MonoBehaviour
         if (Input.GetButtonDown("Jump"))
             _controller.Jump(_stats.JumpHeight); 
 
-        if ((Input.GetButtonUp("Use")))
-        {
-            Debug.Log("Use");
-        }
 
         if ((_climbing || _climbingV2))
         {
@@ -87,7 +82,6 @@ public class PlayerControl : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Enter " + collision.gameObject.tag);
         if (collision.gameObject.CompareTag("Ladder"))
         {
             _showUseMsg = true;
@@ -119,7 +113,6 @@ public class PlayerControl : MonoBehaviour
             if ((Input.GetButtonUp("Use")))
             {
                 _climbing = true;
-                Debug.Log("Use");
             }
         }
 
@@ -137,7 +130,6 @@ public class PlayerControl : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        Debug.Log("Exit " + collision.gameObject.tag);
         if (collision.gameObject.CompareTag("Ladder"))
         {
 
