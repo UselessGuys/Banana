@@ -68,16 +68,16 @@ public class DynamicObject : MonoBehaviour
 
     public void Jump(float jumpHeight)
     {
-        if (_collisions.Below)
-        {
-            Velocity.y = jumpHeight;
-            _isDoubleJumping = false;
-        }
-        if (CanDoubleJump && !_collisions.Below && !_isDoubleJumping)
-        {
-            Velocity.y = jumpHeight;
-            _isDoubleJumping = true;
-        }
+            if (_collisions.Below)
+            {
+                Velocity.y = jumpHeight;
+                _isDoubleJumping = false;
+            }
+            if (CanDoubleJump && !_collisions.Below && !_isDoubleJumping)
+            {
+                Velocity.y = jumpHeight;
+                _isDoubleJumping = true;
+            }
     }
 
     private void Awake()
