@@ -1,5 +1,6 @@
 ﻿// Velocity, Gravity, MoveAcrossPlatform
 // Method "Jump"
+// ToDo проект в 6 Шарп, кттс
 
 using System;
 using UnityEngine;
@@ -35,10 +36,9 @@ public class DynamicObject : MonoBehaviour
             SlopeAngle = 0f;
         }
     }
-
     private const float SkinWidth = .015f;
-    private const float DstBetweenRays = .25f;
-    private const float MaxClimbAngle = 80f;
+    private const float DstBetweenRays = .20f;
+    private const float MaxClimbAngle = 60f;
     private const float MaxDescendAngle = 80f;
     private const float FallingThroughPlatformResetTimer = 0.1f;
 
@@ -50,7 +50,9 @@ public class DynamicObject : MonoBehaviour
     private BoxCollider2D _collider;
     private CollisionInfo _collisions;
 
+    public const float MaxHorisontalLadder = .4f;
 
+    [Tools.Tooltip("Слой земли")]
     public LayerMask CollisionMask; 
     public bool CanDoubleJump;
 
@@ -58,7 +60,8 @@ public class DynamicObject : MonoBehaviour
     [HideInInspector] public float Gravity;
     [HideInInspector] public bool MoveAcrossPlatform { get; set; }
 
-    [HideInInspector] public float ObjectHeight { get; private set; } //ToDo проект в 6 Шарп, кттс
+    [HideInInspector] public float ObjectHeight { get; private set; }
+    [HideInInspector] public float ObjectWidth { get; private set; }
     [HideInInspector] public bool Grounded;
     [HideInInspector] public RaycastOrigins RaycastOrigin;
 
@@ -81,7 +84,8 @@ public class DynamicObject : MonoBehaviour
     {
         _collider = GetComponent<BoxCollider2D>();
 
-        ObjectHeight = transform.localScale.y * _collider.size.y;       
+        ObjectHeight = transform.localScale.y * _collider.size.y;
+        ObjectWidth = transform.localScale.x * _collider.size.x;
     }
 
     private void Start()
@@ -140,6 +144,7 @@ public class DynamicObject : MonoBehaviour
             rayLength = 2 * SkinWidth;
         }
 
+
         for (int i = 0; i < _horizontalRayCount; i++)
         {
             Vector2 rayOrigin = (directionX == -1) ? RaycastOrigin.BottomLeft : RaycastOrigin.BottomRight;
@@ -150,6 +155,11 @@ public class DynamicObject : MonoBehaviour
 
             if (hit && hit.distance > 0)
             {
+                if (hit.distance < SkinWidth * 2)
+                    if (hit.collider.gameObject.transform.lossyScale.y < MaxHorisontalLadder && i == 0 && Grounded)
+                           transform.Translate(directionX * SkinWidth, hit.collider.gameObject.transform.lossyScale.y, 0);
+
+
 
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 
@@ -168,6 +178,8 @@ public class DynamicObject : MonoBehaviour
                     }
                     ClimbSlope(ref moveAmount, slopeAngle);
                     moveAmount.x += distanceToSlopeStart * directionX;
+
+                    // ToDo Хождение по наклонам
                 }
 
                 if (!_collisions.ClimbingSlope || slopeAngle > MaxClimbAngle)
