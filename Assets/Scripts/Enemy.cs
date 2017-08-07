@@ -117,16 +117,16 @@ internal class Enemy : MonoBehaviour
         foreach (var player in players)
         {
             if (Math.Abs(player.transform.position.x - this.transform.position.x) 
-                - player.GetComponent<DynamicObject>().ObjectWeght / 2 
-                - this._controller.ObjectWeght / 2 <
+                - player.GetComponent<DynamicObject>().ObjectWidth / 2 
+                - this._controller.ObjectWidth / 2 <
                 _stats.HearRange * player.GetComponent<CharacterStats>().Noise) 
             {
                 State = EnemyStates.Attack;
                 _target = player;
             }
             Debug.Log(Math.Abs(player.transform.position.x - this.transform.position.x)
-                - player.GetComponent<DynamicObject>().ObjectWeght / 2
-                - this._controller.ObjectWeght / 2);
+                - player.GetComponent<DynamicObject>().ObjectWidth / 2
+                - this._controller.ObjectWidth / 2);
         }
     }
 

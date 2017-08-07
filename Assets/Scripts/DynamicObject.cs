@@ -61,7 +61,7 @@ public class DynamicObject : MonoBehaviour
     [HideInInspector] public bool MoveAcrossPlatform { get; set; }
 
     [HideInInspector] public float ObjectHeight { get; private set; }
-    [HideInInspector] public float ObjectWeght { get; private set; }
+    [HideInInspector] public float ObjectWidth { get; private set; }
     [HideInInspector] public bool Grounded;
     [HideInInspector] public RaycastOrigins RaycastOrigin;
 
@@ -85,7 +85,7 @@ public class DynamicObject : MonoBehaviour
         _collider = GetComponent<BoxCollider2D>();
 
         ObjectHeight = transform.localScale.y * _collider.size.y;
-        ObjectWeght = transform.localScale.x * _collider.size.x;
+        ObjectWidth = transform.localScale.x * _collider.size.x;
     }
 
     private void Start()
@@ -178,6 +178,8 @@ public class DynamicObject : MonoBehaviour
                     }
                     ClimbSlope(ref moveAmount, slopeAngle);
                     moveAmount.x += distanceToSlopeStart * directionX;
+
+                    // ToDo Хождение по наклонам
                 }
 
                 if (!_collisions.ClimbingSlope || slopeAngle > MaxClimbAngle)
