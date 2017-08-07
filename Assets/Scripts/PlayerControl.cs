@@ -4,10 +4,16 @@ using UnityEngine;
 [RequireComponent(typeof(DynamicObject))]
 public class PlayerControl : MonoBehaviour
 {
+    public enum LadderSide
+    {
+        Right,
+        Left
+    }
     private Animator _animator;
     private DynamicObject _controller;
     private CharacterStats _stats;
     private SpriteRenderer _renderer;
+    private LadderSide _ladderSide;
     private bool _climbing;
     private bool _climbingV2;
     private bool _exitLadder;
@@ -46,21 +52,35 @@ public class PlayerControl : MonoBehaviour
                 _renderer.flipX = false;
             }
         }
-        
+
 
         if (Input.GetButtonDown("Jump"))
-            _controller.Jump(_stats.JumpHeight); 
+        {
+            _controller.Jump(_stats.JumpHeight);
+        }
 
+        if ((Input.GetButtonDown("Jump") || Input.GetAxisRaw("Horizontal") != 0) && (_exitLadder || _enterLadder) && _climbingV2)
+        {
+            _climbingV2 = false;
+            _controller.Velocity.y = _stats.JumpHeight;
+        }
+
+
+        if ((Input.GetButtonDown("Jump") || ((Input.GetAxisRaw("Horizontal") > 0) && (_ladderSide == LadderSide.Left)) || ((Input.GetAxisRaw("Horizontal") < 0) && (_ladderSide == LadderSide.Right))) && (_exitLadder || _enterLadder) && _climbing)
+        {
+            _climbing = false;
+            _controller.Velocity.y = _stats.JumpHeight;
+        }
 
         if ((_climbing || _climbingV2))
         {
-            if ((Input.GetButtonDown("Jump") || Input.GetAxisRaw("Horizontal") != 0) && (_exitLadder || _enterLadder))
-            {
-                _climbing = false;
-                _climbingV2 = false;
-            }
+
             _controller.Gravity = 0;
             _controller.Velocity.x = 0;
+            if (_endLadder)
+            {
+               _controller.Velocity.y = 0;
+            }
             if (!_endLadder || Input.GetAxisRaw("Vertical") < 0)
             {
                 _controller.Velocity.y = Input.GetAxisRaw("Vertical") * _stats.MoveSpeed;
@@ -84,7 +104,15 @@ public class PlayerControl : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ladder"))
         {
-          
+            if (collision.transform.position.x < this.transform.position.x)
+            {
+                _ladderSide = LadderSide.Left;
+                
+            }
+            else
+            {
+                _ladderSide = LadderSide.Right;
+            }
         }
 
         if (collision.gameObject.CompareTag("LadderV2"))
@@ -102,10 +130,9 @@ public class PlayerControl : MonoBehaviour
             _enterLadder = true;
         }
 
-        if (collision.gameObject.CompareTag("EndLadder") && (_climbing || _climbingV2))
+        if (collision.gameObject.CompareTag("EndLadder"))
         {
             _endLadder = true;
-            _controller.Velocity.y = 0;
         }
 
 
@@ -115,7 +142,7 @@ public class PlayerControl : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ladder"))
         {
-            if ((Input.GetAxisRaw("Vertical") > 0.1f) && !_exitLadder)
+            if ((((Input.GetAxisRaw("Horizontal") < 0) && (_ladderSide == LadderSide.Left)) || ((Input.GetAxisRaw("Horizontal") > 0) && (_ladderSide == LadderSide.Right))) && !_exitLadder)
             {
                 _climbing = true;
             }
