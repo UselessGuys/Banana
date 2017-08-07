@@ -124,9 +124,6 @@ internal class Enemy : MonoBehaviour
                 State = EnemyStates.Attack;
                 _target = player;
             }
-            Debug.Log(Math.Abs(player.transform.position.x - this.transform.position.x)
-                - player.GetComponent<DynamicObject>().ObjectWidth / 2
-                - this._controller.ObjectWidth / 2);
         }
     }
 
@@ -156,7 +153,8 @@ internal class Enemy : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * (_rightDirection ? 1 : -1), RayLength);
 
             Debug.DrawRay(rayOrigin, Vector2.right * (_rightDirection ? 1 : -1), Color.blue);
-
+            if (hit.collider != null)
+                Debug.Log(hit.collider.name);
             if (hit.collider != null && hit.collider.CompareTag("Ground")
                 && hit.collider.gameObject.transform.lossyScale.y > DynamicObject.MaxHorisontalLadder)            
             {
