@@ -155,11 +155,11 @@ public class DynamicObject : MonoBehaviour
 
             if (hit && hit.distance > 0)
             {
-                if (hit.distance < SkinWidth * 2)
-                    if (hit.collider.gameObject.transform.lossyScale.y < MaxHorisontalLadder && i == 0 && Grounded)
-                           transform.Translate(directionX * SkinWidth, hit.collider.gameObject.transform.lossyScale.y, 0);
-
-
+                if (((hit.collider.transform.position.y + hit.collider.bounds.size.y/2) - hit.point.y) < MaxHorisontalLadder && i == 0 && Grounded)
+                {
+                    transform.Translate(directionX * SkinWidth, ((hit.collider.transform.position.y + hit.collider.bounds.size.y / 2) - hit.point.y) + 0.01f,
+                        0);
+                }
 
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
 

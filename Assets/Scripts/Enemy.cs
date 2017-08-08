@@ -22,8 +22,8 @@ internal class Enemy : MonoBehaviour
     private const float RayLength = 1f;
    
 
-    public int LeftBorder;
-    public int RightBorder;
+    public float LeftBorder;
+    public float RightBorder;
     public EnemyStates State;
 
     private CharacterStats _stats;
@@ -48,7 +48,8 @@ internal class Enemy : MonoBehaviour
 
     void Start()
     {
-        
+        RightBorder = transform.position.x + RightBorder;
+        LeftBorder = transform.position.x - LeftBorder;
         _rightDirection = Random.Next(0, 1) == 1;
 
         _currentAngle = 0;
@@ -153,12 +154,10 @@ internal class Enemy : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.right * (_rightDirection ? 1 : -1), RayLength);
 
             Debug.DrawRay(rayOrigin, Vector2.right * (_rightDirection ? 1 : -1), Color.blue);
-            if (hit.collider != null)
-                Debug.Log(hit.collider.name);
-            if (hit.collider != null && hit.collider.CompareTag("Ground")
-                && hit.collider.gameObject.transform.lossyScale.y > DynamicObject.MaxHorisontalLadder)            
+
+            if ((hit.collider != null) && (hit.collider.CompareTag("Ground")) && ((hit.collider.transform.position.y + hit.collider.bounds.size.y / 2) - hit.point.y) > DynamicObject.MaxHorisontalLadder)
             {
-                _controller.Jump(_stats.JumpHeight);
+               _controller.Jump(_stats.JumpHeight);
             }
 
         }
