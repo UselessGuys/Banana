@@ -1,8 +1,11 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
+#endif 
 using UnityEngine;
 
 namespace Tools
 {
+#if UNITY_EDITOR
     [CustomEditor(typeof(Enemy))]
     public class MonsterEditor : Editor
     {
@@ -30,4 +33,5 @@ namespace Tools
             DrawDefaultInspector();
         }
     }
+#endif
 }
