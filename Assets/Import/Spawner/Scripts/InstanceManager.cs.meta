@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 93de513dbd06c8b4581519aeebe101ea
+labels:
+- Spawner
+- EnemySpawn
+timeCreated: 18446744011573954816
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

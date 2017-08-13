@@ -195,6 +195,6 @@ public class PlayerControl : MonoBehaviour
 
     private void OnGUI()
     {
-       
+        GUI.Label(new Rect(10, 10, 100, 100), " " + _stats.Health);
     }
 }
