@@ -8,7 +8,7 @@ public class PlayerInteraction : MonoBehaviour
     private bool one_click = false;
     private bool timer_running;
 
-    public float timer_for_double_click;
+    private float timer_for_double_click;
    
     void Start()
     {
@@ -18,6 +18,9 @@ public class PlayerInteraction : MonoBehaviour
     void Update()
     {
         float delay = 0.5f;
+
+        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        RaycastHit2D hit = Physics2D.Raycast(mousePosition, new Vector2(0, 0), 0.01f);
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -29,16 +32,16 @@ public class PlayerInteraction : MonoBehaviour
             else
             {
 
-                Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                RaycastHit2D hit = Physics2D.Raycast(mousePosition, new Vector2(0, 0), 0.01f);
-                one_click = false;
                 if (hit.collider != null)
                 {
+                   
                     if (hit.collider.CompareTag("NPC"))
                     {
                         hit.collider.GetComponent<NPC>().Interaction();
                     }
                 }
+                one_click = false;
+ 
             }
         }
         if (one_click)

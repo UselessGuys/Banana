@@ -8,7 +8,7 @@ public class NPC : MonoBehaviour
 {
     public enum IterTypes
     {
-        Say,
+        Dialog,
         Quest,
         Sell,
         Buy,
@@ -28,7 +28,7 @@ public class NPC : MonoBehaviour
         _text = new GameObject("NPC_name");
         _text.gameObject.AddComponent<TextMesh>();
         _text.GetComponent<TextMesh>().text = Name;
-        _text.GetComponent<TextMesh>().offsetZ = -10;
+        _text.GetComponent<TextMesh>().offsetZ = -8;
         _text.GetComponent<TextMesh>().characterSize = CharacterSize;
         _text.GetComponent<TextMesh>().anchor = TextAnchor.MiddleCenter;
         _text.transform.parent = this.transform;
@@ -53,7 +53,7 @@ public class NPC : MonoBehaviour
         {
 
         }
-        else if (TypeOfIteraction == IterTypes.Say)
+        else if (TypeOfIteraction == IterTypes.Dialog)
         {
 
         }
@@ -74,6 +74,6 @@ public class NPC : MonoBehaviour
 
     void OnMouseExit()
     {
-        _text.gameObject.SetActive(false);
+       _text.gameObject.SetActive(false);
     }
 }
